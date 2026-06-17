@@ -73,15 +73,15 @@ export default function Home(){
           <div className="flex justify-center mb-3">
             <Folder className="w-10 h-10 text-red-500" />
           </div>
-          <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("digital_record")}</h3>
-          <p className="text-sm text-gray-500 dark:text-slate-400">{t("digital_record_desc")}</p>
+          <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("landing_digital_record")}</h3>
+          <p className="text-sm text-gray-500 dark:text-slate-400">{t("landing_digital_record_desc")}</p>
         </div>
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-red-50 dark:border-slate-800 transition-colors">
           <div className="flex justify-center mb-3">
             <Users className="w-10 h-10 text-red-500" />
           </div>
-          <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("family_account")}</h3>
-          <p className="text-sm text-gray-500 dark:text-slate-400">{t("family_account_desc")}</p>
+          <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("landing_family_account")}</h3>
+          <p className="text-sm text-gray-500 dark:text-slate-400">{t("landing_family_account_desc")}</p>
         </div>
       </div>
     </div>
