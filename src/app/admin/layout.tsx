@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/context/LanguageContext";
-import { LayoutDashboard, Users, ClipboardList, HeartPulse, Stethoscope, ShieldCheck, LogOut, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Users, ClipboardList, HeartPulse, Stethoscope, ShieldCheck, LogOut, Sun, Moon, Shield } from "lucide-react";
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
