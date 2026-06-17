@@ -154,31 +154,45 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile Sidebar Overlay */}
         {isMobileMenuOpen && (
-          <nav className="md:hidden bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800">
-            <ul className="px-2 pt-2 pb-3 space-y-1">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-3 py-2 rounded-2xl text-base font-medium ${
-                        isActive
-                          ? "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 font-bold"
-                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
-                      }`}
-                    >
-                      <span className="mx-2">{item.icon}</span>
-                      {item.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+          <div className="fixed inset-0 z-50 flex justify-start md:hidden">
+            <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setIsMobileMenuOpen(false)}></div>
+            <aside className="relative flex flex-col w-64 max-w-[80%] bg-white dark:bg-slate-900 h-full border-l border-gray-200 dark:border-slate-800 shadow-xl animate-in slide-in-from-right-full">
+              <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-slate-800">
+                <div className="flex items-center">
+                  <img src="/sahacare.jpg" alt="SahaCare" className="h-8 w-8 rounded-full mx-2 border border-red-200" />
+                  <span className="text-xl font-bold text-red-600 dark:text-red-500">SahaCare</span>
+                </div>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+              <nav className="flex-1 overflow-y-auto py-4">
+                <ul className="px-3 space-y-2">
+                  {navigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={`flex items-center px-4 py-3 rounded-2xl text-base font-medium transition-colors ${
+                            isActive
+                              ? "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 font-bold border border-red-100 dark:border-red-500/20"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+                          }`}
+                        >
+                          <span className="mx-3">{item.icon}</span>
+                          {item.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+            </aside>
+          </div>
         )}
 
         {/* Main Area */}

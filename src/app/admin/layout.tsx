@@ -145,23 +145,38 @@ function AdminContent({ children }: { children: React.ReactNode }) {
         </header>
 
         {isMobileMenuOpen && (
-          <nav className="md:hidden bg-zinc-950 dark:bg-zinc-900 text-zinc-300 border-b border-zinc-800 p-2 z-20 absolute w-full mt-20 shadow-xl">
-            <ul className="space-y-1">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.name}>
-                    <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} 
-                      className={`block px-4 py-3 rounded-xl font-bold ${
-                        isActive ? "bg-amber-500 text-zinc-950" : "hover:bg-zinc-800 hover:text-amber-400"
-                      }`}>
-                      {item.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+          <div className="fixed inset-0 z-50 flex justify-start md:hidden">
+            <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setIsMobileMenuOpen(false)}></div>
+            <aside className="relative flex flex-col w-64 max-w-[80%] bg-zinc-950 dark:bg-zinc-900 h-full border-l border-zinc-800 shadow-xl animate-in slide-in-from-right-full text-zinc-300">
+              <div className="flex items-center justify-between h-20 px-4 border-b border-zinc-800">
+                <div className="flex items-center">
+                  <Shield className="w-8 h-8 text-amber-500 mx-2" />
+                  <span className="text-xl font-bold text-amber-500">SahaCare Admin</span>
+                </div>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-zinc-400 hover:text-white">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+              <nav className="flex-1 overflow-y-auto py-4">
+                <ul className="px-3 space-y-2">
+                  {navigation.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <li key={item.name}>
+                        <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} 
+                          className={`flex items-center px-4 py-3 rounded-xl font-bold transition-colors ${
+                            isActive ? "bg-amber-500 text-zinc-950" : "hover:bg-zinc-800 hover:text-amber-400"
+                          }`}>
+                          <span className="mx-3">{item.icon}</span>
+                          {item.name}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+            </aside>
+          </div>
         )}
 
         {/* Main Area */}
