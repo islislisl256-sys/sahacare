@@ -54,9 +54,9 @@ export default function SignIn() {
       <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300 relative overflow-hidden p-4">
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-100/50 via-transparent to-transparent dark:from-indigo-900/20"></div>
 
-        <div className="bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-3xl shadow-xl text-center w-full max-w-md relative z-10 border border-gray-100 dark:border-slate-800 transition-colors">
-          <div className="flex justify-center mb-6">
-            <img src="/sahscare.jpg" alt="SahaCare Logo" className="h-20 w-20 rounded-full object-cover shadow-sm border-2 border-indigo-100 dark:border-slate-700" />
+        <div className="bg-white dark:bg-slate-900 p-6 sm:p-10 rounded-3xl shadow-xl text-center w-full max-w-md relative z-10 border border-gray-100 dark:border-slate-800 transition-colors">
+          <div className="flex justify-center mb-4 sm:mb-6">
+            <img src="/sahacare.jpg" alt="SahaCare Logo" className="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover shadow-sm border-2 border-indigo-100 dark:border-slate-700" />
           </div>
           <h1 className="mb-6 text-2xl font-bold text-gray-800 dark:text-white">{t("signin")}</h1>
           

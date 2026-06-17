@@ -36,52 +36,52 @@ export default function Home(){
       </div>
       
       {status === "loading" ? (
-        <div className="rounded-full px-8 py-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-bold animate-pulse relative z-10">{t("logging_in")}</div>
+        <div className="rounded-full px-4 sm:px-8 py-3 sm:py-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-bold animate-pulse relative z-10 text-sm sm:text-base">{t("logging_in")}</div>
       ) : session ? (
         <Link
           href={getDashboardLink()}
-          className="rounded-full bg-red-600 px-8 py-4 text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200 dark:focus:ring-red-900 font-bold shadow-lg transition-transform hover:scale-105 relative z-10"
+          className="rounded-full bg-red-600 px-4 sm:px-8 py-3 sm:py-4 text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200 dark:focus:ring-red-900 font-bold shadow-lg transition-transform hover:scale-105 relative z-10 text-sm sm:text-base w-full max-w-[200px] sm:max-w-none text-center truncate"
         >
           {t("enter_dashboard")}
         </Link>
       ) : (
-        <div className="flex flex-col sm:flex-row gap-4 relative z-10">
+        <div className="flex flex-col gap-3 sm:gap-4 relative z-10 w-full max-w-[200px] sm:max-w-none">
           <button
             onClick={() => signIn()}
-            className="rounded-full bg-red-600 px-8 py-4 text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200 dark:focus:ring-red-900 font-bold shadow-lg transition-transform hover:scale-105"
+            className="rounded-full bg-red-600 px-4 sm:px-8 py-3 sm:py-4 text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200 dark:focus:ring-red-900 font-bold shadow-lg transition-transform hover:scale-105 text-sm sm:text-base w-full"
           >
             {t("signin")}
           </button>
           <Link
             href="/auth/signup"
-            className="rounded-full bg-white dark:bg-slate-900 border-2 border-red-200 dark:border-red-900/50 px-8 py-4 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30 font-bold shadow-sm transition-transform hover:scale-105 text-center"
+            className="rounded-full bg-white dark:bg-slate-900 border-2 border-red-200 dark:border-red-900/50 px-4 sm:px-8 py-3 sm:py-4 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30 font-bold shadow-sm transition-transform hover:scale-105 text-center text-sm sm:text-base w-full"
           >
             {t("signup")}
           </Link>
         </div>
       )}
 
-      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 text-center max-w-4xl relative z-10">
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-red-50 dark:border-slate-800 transition-colors">
-          <div className="flex justify-center mb-3">
-            <HomeIcon className="w-10 h-10 text-red-500" />
+      <div className="mt-8 sm:mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 text-center w-full max-w-4xl relative z-10 px-2 sm:px-0">
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-red-50 dark:border-slate-800 transition-colors">
+          <div className="flex justify-center mb-2 sm:mb-3">
+            <HomeIcon className="w-8 h-8 sm:w-10 sm:h-10 text-red-500" />
           </div>
-          <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("home_services")}</h3>
-          <p className="text-sm text-gray-500 dark:text-slate-400">{t("home_services_desc")}</p>
+          <h3 className="font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base">{t("home_services")}</h3>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{t("home_services_desc")}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-red-50 dark:border-slate-800 transition-colors">
-          <div className="flex justify-center mb-3">
-            <Folder className="w-10 h-10 text-red-500" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-red-50 dark:border-slate-800 transition-colors">
+          <div className="flex justify-center mb-2 sm:mb-3">
+            <Folder className="w-8 h-8 sm:w-10 sm:h-10 text-red-500" />
           </div>
-          <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("landing_digital_record")}</h3>
-          <p className="text-sm text-gray-500 dark:text-slate-400">{t("landing_digital_record_desc")}</p>
+          <h3 className="font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base">{t("landing_digital_record")}</h3>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{t("landing_digital_record_desc")}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-red-50 dark:border-slate-800 transition-colors">
-          <div className="flex justify-center mb-3">
-            <Users className="w-10 h-10 text-red-500" />
+        <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-red-50 dark:border-slate-800 transition-colors">
+          <div className="flex justify-center mb-2 sm:mb-3">
+            <Users className="w-8 h-8 sm:w-10 sm:h-10 text-red-500" />
           </div>
-          <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t("landing_family_account")}</h3>
-          <p className="text-sm text-gray-500 dark:text-slate-400">{t("landing_family_account_desc")}</p>
+          <h3 className="font-bold text-gray-900 dark:text-white mb-1 sm:mb-2 text-sm sm:text-base">{t("landing_family_account")}</h3>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400">{t("landing_family_account_desc")}</p>
         </div>
       </div>
     </div>
