@@ -25,7 +25,7 @@ export default function Home(){
       
       <div className="text-center mb-8 relative z-10">
         <div className="flex justify-center mb-4">
-          <img src="/sahscare.jpg" alt="SahaCare Logo" className="h-32 w-32 rounded-full object-cover shadow-lg border-4 border-white dark:border-slate-800" />
+          <img src="/sahacare.jpg" alt="SahaCare Logo" className="h-32 w-32 rounded-full object-cover shadow-lg border-4 border-white dark:border-slate-800" />
         </div>
         <h1 className="text-4xl font-extrabold text-red-700 dark:text-red-500 tracking-tight">
           SahaCare
