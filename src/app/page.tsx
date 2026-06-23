@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { Home as HomeIcon, Folder, Users } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Home(){
   const { data: session, status } = useSession();
@@ -22,6 +24,12 @@ export default function Home(){
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-slate-950 p-4 transition-colors duration-300 relative overflow-hidden">
       {/* Background patterns */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-100/50 via-transparent to-transparent dark:from-red-900/20"></div>
+      
+      {/* Top Bar for Language and Theme */}
+      <div className="fixed top-4 left-4 z-50 flex items-center gap-2">
+        <LanguageSwitcher />
+        <ThemeToggle />
+      </div>
       
       <div className="text-center mb-8 relative z-10">
         <div className="flex justify-center mb-4">

@@ -7,7 +7,7 @@ export default function AIChatButton() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
-    { role: "assistant", text: "مرحباً! أنا مساعد SahaCare الذكي 🏥\nيمكنني مساعدتك في:\n• وصف الأعراض\n• اختيار الخدمة المناسبة\n• الإجابة على أسئلتك الصحية" }
+    { role: "assistant", text: "مرحباً! أنا مساعد SahaCare الذكي\nيمكنني مساعدتك في:\n• وصف الأعراض\n• اختيار الخدمة المناسبة\n• الإجابة على أسئلتك الصحية" }
   ]);
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +21,7 @@ export default function AIChatButton() {
     setTimeout(() => {
       setMessages(prev => [...prev, {
         role: "assistant",
-        text: "شكراً على سؤالك! هذه الخاصية ستكون متاحة قريباً مع الذكاء الاصطناعي الكامل. في الوقت الراهن يمكنك طلب خدمة صحية مباشرة من قائمة الخدمات 💙"
+        text: "شكراً على سؤالك! هذه الخاصية ستكون متاحة قريباً مع الذكاء الاصطناعي الكامل. في الوقت الراهن يمكنك طلب خدمة صحية مباشرة من قائمة الخدمات."
       }]);
       setLoading(false);
     }, 1200);

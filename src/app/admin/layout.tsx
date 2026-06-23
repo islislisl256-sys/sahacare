@@ -7,40 +7,8 @@ import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/context/LanguageContext";
 import { LayoutDashboard, Users, ClipboardList, HeartPulse, Stethoscope, ShieldCheck, LogOut, Sun, Moon, Shield } from "lucide-react";
 
-function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const { t } = useLanguage();
-
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
-
-  return (
-    <button
-      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      className="p-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center w-10 h-10"
-      title={resolvedTheme === 'dark' ? t('theme_light') : t('theme_dark')}
-    >
-      {resolvedTheme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-    </button>
-  );
-}
-
-function LanguageSwitcher() {
-  const { language, setLanguage } = useLanguage();
-  return (
-    <select
-      value={language}
-      onChange={(e) => setLanguage(e.target.value as any)}
-      className="bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 text-sm rounded-xl px-3 py-2 outline-none border border-transparent focus:border-amber-500 font-bold"
-    >
-      <option value="ar">AR</option>
-      <option value="fr">FR</option>
-      <option value="en">EN</option>
-    </select>
-  );
-}
-
+import ThemeToggle from "@/components/ThemeToggle";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 function AdminContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
