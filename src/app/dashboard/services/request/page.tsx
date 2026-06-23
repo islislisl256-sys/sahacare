@@ -124,7 +124,7 @@ export default function RequestServicePage() {
         {/* Location Input */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-3">
           <label className="flex items-center gap-2 font-bold text-gray-800 dark:text-white text-sm">
-            <MapPin className="w-4 h-4 text-red-500" /> عنوانك (Google Maps)
+            <MapPin className="w-4 h-4 text-red-500" /> موقعك على الخريطة
           </label>
           <div className="relative">
             <input
@@ -132,7 +132,7 @@ export default function RequestServicePage() {
               value={address}
               onChange={e => setAddress(e.target.value)}
               onFocus={() => address.length > 2 && setShowSuggestions(true)}
-              placeholder="ابحث عن عنوانك..."
+              placeholder="ابحث بالاسم، الحي، أو حدد على الخريطة..."
               className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors"
             />
             <MapPin className="absolute left-3 top-3.5 w-4 h-4 text-gray-400 dark:text-slate-500" />
