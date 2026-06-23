@@ -9,7 +9,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { Sun, Moon, Megaphone, Hospital, Star, UserCircle, Shield, LogOut } from "lucide-react";
 
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { t } = useLanguage();
 
@@ -18,11 +18,11 @@ function ThemeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
       className="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center w-10 h-10"
-      title={theme === 'dark' ? t('theme_light') : t('theme_dark')}
+      title={resolvedTheme === 'dark' ? t('theme_light') : t('theme_dark')}
     >
-      {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
     </button>
   );
 }
@@ -72,7 +72,7 @@ function ProviderContent({ children }: { children: React.ReactNode }) {
       {/* Sidebar (Desktop) */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 transition-colors duration-300">
         <div className="flex items-center justify-center h-20 border-b border-slate-200 dark:border-slate-800">
-          <img src="/sahscare.jpg" alt="SahaCare" className="h-10 w-10 rounded-full mx-3 border border-teal-200 shadow-sm" />
+          <img src="/sahacare.jpg" alt="SahaCare" className="h-10 w-10 rounded-full mx-3 border border-blue-200 shadow-sm" />
           <h1 className="text-xl font-bold text-teal-600 dark:text-teal-400">{t("provider_dashboard")}</h1>
         </div>
         <nav className="flex-1 overflow-y-auto py-6">
@@ -213,6 +213,27 @@ function ProviderContent({ children }: { children: React.ReactNode }) {
                   })}
                 </ul>
               </nav>
+              <div className="p-4 border-t border-gray-200 dark:border-slate-800">
+                <Link
+                  href={(session?.user as any)?.role === 'admin' ? "/admin" : "/admin-login"}
+                  className="mb-4 w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 rounded-2xl transition-colors border border-amber-200 dark:border-amber-500/30 shadow-sm"
+                >
+                  <Shield className="w-4 h-4" /> {t("admin_panel")}
+                </Link>
+                <div className="flex items-center bg-gray-50 dark:bg-slate-800 p-3 rounded-2xl border border-gray-100 dark:border-slate-700">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-700 dark:text-blue-400 font-bold">
+                    {session?.user?.email?.[0]?.toUpperCase() || "P"}
+                  </div>
+                  <div className="mx-3 overflow-hidden">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {session?.user?.name || t("provider_dashboard")}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {session?.user?.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </aside>
           </div>
         )}

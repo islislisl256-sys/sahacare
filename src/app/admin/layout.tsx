@@ -8,7 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { LayoutDashboard, Users, ClipboardList, HeartPulse, Stethoscope, ShieldCheck, LogOut, Sun, Moon, Shield } from "lucide-react";
 
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { t } = useLanguage();
 
@@ -17,11 +17,11 @@ function ThemeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
       className="p-2 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center w-10 h-10"
-      title={theme === 'dark' ? t('theme_light') : t('theme_dark')}
+      title={resolvedTheme === 'dark' ? t('theme_light') : t('theme_dark')}
     >
-      {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
     </button>
   );
 }
@@ -120,7 +120,7 @@ function AdminContent({ children }: { children: React.ReactNode }) {
           <div className="flex items-center">
             <h2 className="hidden md:block text-2xl font-bold text-zinc-800 dark:text-white">نظام الإدارة - SahaCare</h2>
             <div className="md:hidden flex items-center">
-              <img src="/sahscare.jpg" alt="SahaCare" className="h-8 w-8 rounded-full ml-2 border-2 border-amber-500" />
+              <img src="/sahacare.jpg" alt="SahaCare" className="h-8 w-8 rounded-full ml-2 border-2 border-amber-500" />
               <h1 className="text-lg font-bold text-amber-600 dark:text-amber-500">SahaCare Admin</h1>
             </div>
           </div>
@@ -175,6 +175,21 @@ function AdminContent({ children }: { children: React.ReactNode }) {
                   })}
                 </ul>
               </nav>
+              <div className="p-4 border-t border-zinc-800">
+                <div className="flex items-center bg-zinc-900 p-3 rounded-xl border border-zinc-700">
+                  <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-zinc-900 font-bold text-lg">
+                    {session?.user?.email?.[0]?.toUpperCase() || "A"}
+                  </div>
+                  <div className="mx-3 overflow-hidden">
+                    <p className="text-sm font-bold text-white truncate">
+                      {session?.user?.name || "المدير العام"}
+                    </p>
+                    <p className="text-xs text-amber-400 truncate">
+                      {session?.user?.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </aside>
           </div>
         )}
