@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MapPin, Upload, X, FileText, ChevronRight, CheckCircle2, Loader2 } from "lucide-react";
 
@@ -11,7 +11,7 @@ const SERVICE_LABELS: Record<string, { label: string; color: string }> = {
   "lab-tests": { label: "تحاليل طبية", color: "red" },
 };
 
-export default function RequestServicePage() {
+function RequestServiceContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const serviceType = searchParams?.get("type") || "physical-therapy";
@@ -245,5 +245,13 @@ export default function RequestServicePage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function RequestServicePage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-red-500" /></div>}>
+      <RequestServiceContent />
+    </Suspense>
   );
 }
