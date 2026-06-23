@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Clock, CheckCircle2, XCircle, Activity, Brain, Baby, TestTube2, ChevronLeft } from "lucide-react";
 
-const SERVICE_ICONS: Record<string, JSX.Element> = {
+const SERVICE_ICONS: Record<string, React.ReactNode> = {
   "physical-therapy": <Activity className="w-5 h-5" />,
   "psychiatry": <Brain className="w-5 h-5" />,
   "pediatrics": <Baby className="w-5 h-5" />,
