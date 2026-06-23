@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/context/LanguageContext";
-import { Sun, Moon, LayoutDashboard, Users, Activity, FileText, User, Shield, LogOut } from "lucide-react";
+import { Sun, Moon, LayoutDashboard, Users, Activity, FileText, User, Shield, LogOut, HeartPulse, ClipboardList } from "lucide-react";
+import AIChatButton from "@/components/AIChatButton";
 
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -50,8 +51,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     { name: t("patient_dashboard"), href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { name: "الخدمات الصحية", href: "/dashboard/services", icon: <HeartPulse className="w-5 h-5" /> },
+    { name: "طلباتي", href: "/dashboard/my-requests", icon: <ClipboardList className="w-5 h-5" /> },
     { name: t("family"), href: "/dashboard/family", icon: <Users className="w-5 h-5" /> },
-    { name: t("requests"), href: "/dashboard/requests", icon: <Activity className="w-5 h-5" /> },
     { name: t("records"), href: "/dashboard/records", icon: <FileText className="w-5 h-5" /> },
     { name: t("profile"), href: "/dashboard/profile", icon: <User className="w-5 h-5" /> },
   ];
@@ -223,6 +225,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+      <AIChatButton />
     </div>
   );
 }
