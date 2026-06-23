@@ -14,7 +14,7 @@ const SERVICE_LABELS: Record<string, { label: string; color: string }> = {
 export default function RequestServicePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const serviceType = searchParams.get("type") || "physical-therapy";
+  const serviceType = searchParams?.get("type") || "physical-therapy";
   const service = SERVICE_LABELS[serviceType] || SERVICE_LABELS["physical-therapy"];
   const isLabTest = serviceType === "lab-tests";
 
