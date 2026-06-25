@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams, useRouter } from "next/navigation";
-import { User, Activity, FileText, Calendar, Clock, MapPin, ChevronRight, Download, Brain, Baby, TestTube2, Image as ImageIcon } from "lucide-react";
-import React from "react";
+import { User, Activity, FileText, Calendar, Clock, MapPin, ChevronRight, Download, Brain, Baby, TestTube2, Image as ImageIcon, Star, MessageSquare } from "lucide-react";
+import React, { useState } from "react";
 
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
   "physical-therapy": <Activity className="w-6 h-6" />,
@@ -60,7 +60,7 @@ const MOCK_TREATMENTS: Record<string, any> = {
     report: "تم إجراء تحليل صورة دم كاملة (CBC) وتحليل سكر صائم. جميع المؤشرات الحيوية في نطاقها الطبيعي، ما عدا نقص طفيف جداً في فيتامين د.",
     notes: "مرفق صورة مفصلة لنتيجة التحاليل من المختبر للرجوع إليها أو عرضها على طبيبك المختص.",
     hasImage: true,
-    imageUrl: "https://images.unsplash.com/photo-1579154204601-01588f351e67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    imageUrl: "/lab_result.png"
   }
 };
 
@@ -70,6 +70,11 @@ export default function TreatmentDetailsPage() {
   const id = params?.id as string;
   
   const treatment = MOCK_TREATMENTS[id];
+
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [submittedFeedback, setSubmittedFeedback] = useState(false);
 
   if (!treatment) {
     return (
@@ -171,6 +176,76 @@ export default function TreatmentDetailsPage() {
           </div>
         </div>
       )}
+
+      {/* Rating & Patient Feedback Section */}
+      <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors mt-6">
+        <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2 text-lg">
+          <MessageSquare className="w-6 h-6 text-indigo-500" /> تقييمك ورأيك في الخدمة
+        </h3>
+
+        {submittedFeedback ? (
+          <div className="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 p-6 rounded-2xl text-center">
+            <h4 className="font-bold text-indigo-700 dark:text-indigo-400 mb-2">شكراً لتقييمك!</h4>
+            <p className="text-sm text-indigo-600/80 dark:text-indigo-300/80 mb-4">تم إرسال تقييمك وملاحظاتك إلى مقدم الخدمة.</p>
+            <div className="flex justify-center gap-1 mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star key={star} className={`w-6 h-6 ${star <= rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-700'}`} />
+              ))}
+            </div>
+            {feedback && (
+              <p className="text-slate-700 dark:text-slate-300 italic bg-white dark:bg-slate-800 p-4 rounded-xl border border-indigo-100 dark:border-indigo-500/20 text-right">
+                "{feedback}"
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block">كيف تقيم تجربتك مع {treatment.providerName}؟</label>
+              <div className="flex items-center gap-2" dir="ltr">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    className="focus:outline-none transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`w-8 h-8 transition-colors ${
+                        star <= (hoverRating || rating)
+                          ? 'fill-amber-400 text-amber-400'
+                          : 'fill-transparent text-slate-300 dark:text-slate-700 hover:text-amber-200'
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block">هل لديك أي ملاحظات أو تقرير خاص بك تود إضافته؟ (اختياري)</label>
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="اكتب ملاحظاتك هنا..."
+                rows={4}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-sm outline-none focus:border-indigo-500 transition-colors text-slate-900 dark:text-white resize-none"
+              />
+            </div>
+
+            <button
+              onClick={() => setSubmittedFeedback(true)}
+              disabled={rating === 0}
+              className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              إرسال التقييم
+            </button>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
