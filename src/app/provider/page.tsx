@@ -1,13 +1,21 @@
 'use client';
 
 import { useLanguage } from "@/context/LanguageContext";
-import { Megaphone, Hourglass, DollarSign, MapPin, Clock, FileText, Loader2 } from "lucide-react";
+import { Megaphone, Hourglass, DollarSign, MapPin, Clock, FileText, Loader2, X, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function ProviderDashboard() {
   const { t } = useLanguage();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Offer Modal State
+  const [selectedReqId, setSelectedReqId] = useState<string | null>(null);
+  const [offerPrice, setOfferPrice] = useState("");
+  const [offerMessage, setOfferMessage] = useState("");
+  const [submittingOffer, setSubmittingOffer] = useState(false);
+  const [offerError, setOfferError] = useState("");
+  const [offerSuccess, setOfferSuccess] = useState(false);
 
   // Translations for service types
   const SERVICE_LABELS: Record<string, string> = {
@@ -18,28 +26,64 @@ export default function ProviderDashboard() {
   };
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const res = await fetch("/api/requests");
-        const json = await res.json();
-        if (json.data) {
-          setRequests(json.data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchRequests();
   }, []);
 
-  const handleOfferSubmit = (reqId: string) => {
-    alert("سيتم إضافة نظام تقديم العروض (Offers) في الخطوة القادمة!");
+  const fetchRequests = async () => {
+    try {
+      const res = await fetch("/api/requests");
+      const json = await res.json();
+      if (json.data) {
+        setRequests(json.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedReqId || !offerPrice) return;
+    
+    setSubmittingOffer(true);
+    setOfferError("");
+    
+    try {
+      const res = await fetch("/api/offers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: selectedReqId,
+          price: parseFloat(offerPrice),
+          message: offerMessage
+        })
+      });
+      
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "فشل في إرسال العرض");
+      }
+      
+      setOfferSuccess(true);
+      setTimeout(() => {
+        setOfferSuccess(false);
+        setSelectedReqId(null);
+        setOfferPrice("");
+        setOfferMessage("");
+        fetchRequests(); // Refresh the list
+      }, 2000);
+      
+    } catch (err: any) {
+      setOfferError(err.message || "حدث خطأ");
+    } finally {
+      setSubmittingOffer(false);
+    }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors">
@@ -116,7 +160,7 @@ export default function ProviderDashboard() {
                   {req.description || "لا يوجد تفاصيل إضافية."}
                 </p>
                 <div className="flex gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <button onClick={() => handleOfferSubmit(req.id)} className="bg-teal-600 dark:bg-teal-500 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors shadow-sm">
+                  <button onClick={() => setSelectedReqId(req.id)} className="bg-teal-600 dark:bg-teal-500 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors shadow-sm">
                     {t("submit_offer")}
                   </button>
                   {req.prescription_url && (
@@ -130,6 +174,64 @@ export default function ProviderDashboard() {
           )}
         </div>
       </div>
+
+      {/* Offer Submission Modal */}
+      {selectedReqId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md p-6 shadow-xl border border-slate-200 dark:border-slate-800">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">تقديم عرض سعر</h3>
+              <button onClick={() => setSelectedReqId(null)} className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {offerSuccess ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white">تم إرسال العرض بنجاح!</h4>
+              </div>
+            ) : (
+              <form onSubmit={submitOffer} className="space-y-4">
+                {offerError && <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm font-bold">{offerError}</div>}
+                
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">السعر المقترح (دج)</label>
+                  <input 
+                    type="number" 
+                    required
+                    value={offerPrice}
+                    onChange={(e) => setOfferPrice(e.target.value)}
+                    placeholder="مثال: 2500" 
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:text-white transition-colors" 
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">رسالة للمريض (اختياري)</label>
+                  <textarea 
+                    value={offerMessage}
+                    onChange={(e) => setOfferMessage(e.target.value)}
+                    rows={3}
+                    placeholder="أضف تفاصيل عن عرضك أو توقيت متاح..." 
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:text-white resize-none transition-colors"
+                  ></textarea>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  disabled={submittingOffer}
+                  className="w-full py-3.5 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                >
+                  {submittingOffer ? <Loader2 className="w-5 h-5 animate-spin" /> : "إرسال العرض"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
