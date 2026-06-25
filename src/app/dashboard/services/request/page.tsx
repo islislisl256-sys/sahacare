@@ -207,12 +207,25 @@ function RequestServiceContent() {
           
           {/* Mock Map View embedded */}
           {showMapModal && (
-            <div className="w-full h-48 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 flex flex-col items-center justify-center gap-2 overflow-hidden relative mt-2 group cursor-pointer" onClick={() => { setAddress("الجزائر العاصمة، تحديد من الخريطة"); setShowMapModal(false); }}>
-              {/* Map background pattern */}
-              <div className="absolute inset-0 opacity-20 dark:opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ef4444 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-              <Map className="w-8 h-8 text-red-500 animate-bounce relative z-10" />
-              <p className="text-sm font-bold text-slate-700 dark:text-slate-300 relative z-10">خريطة تفاعلية للجزائر</p>
-              <p className="text-xs text-slate-500 relative z-10 group-hover:text-red-500 transition-colors">اضغط لتأكيد موقعك الحالي</p>
+            <div className="w-full h-64 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden relative mt-2 group shadow-inner">
+              {/* Map background image */}
+              <img src="/map.png" alt="خريطة" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              
+              {/* Center Pin */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <MapPin className="w-10 h-10 text-red-600 drop-shadow-md -mt-10" fill="currentColor" />
+              </div>
+              
+              {/* Overlay UI */}
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
+                <button
+                  type="button"
+                  onClick={() => { setAddress("الجزائر، تحديد من الخريطة"); setShowMapModal(false); }}
+                  className="bg-gray-900/90 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-lg backdrop-blur-sm transition-colors text-sm"
+                >
+                  تأكيد هذا الموقع
+                </button>
+              </div>
             </div>
           )}
         </div>
