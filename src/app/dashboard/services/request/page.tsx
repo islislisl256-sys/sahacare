@@ -23,30 +23,27 @@ function RequestServiceContent() {
   const router = useRouter();
   const { t } = useLanguage();
 
-  const SERVICE_LABELS: Record<string, { label: string; color: string }> = {
-    "physical-therapy": { label: t("service_physical_therapy"), color: "blue" },
-    "psychiatry":       { label: t("service_psychiatry"),       color: "purple" },
-    "pediatrics":       { label: t("service_pediatrics"),       color: "green" },
-    "lab-tests":        { label: t("service_lab_tests"),        color: "red" },
-  };
-
   const serviceType = searchParams?.get("type") || "physical-therapy";
   const service = SERVICE_LABELS[serviceType] || SERVICE_LABELS["physical-therapy"];
   const isLabTest = serviceType === "lab-tests";
 
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [locationLat, setLocationLat] = useState<number | null>(null);
+  const [locationLng, setLocationLng] = useState<number | null>(null);
   const [showMapModal, setShowMapModal] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<{name: string, lat: number, lon: number}[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [notes, setNotes] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [budget, setBudget] = useState("");
+  
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -59,9 +56,15 @@ function RequestServiceContent() {
             const parsedSuggestions = data.map((d: any) => {
               const name = d.address.road || d.name;
               const city = d.address.city || d.address.town || d.address.state;
-              return `${name}${city ? '، ' + city : ''}`;
+              return {
+                name: `${name}${city ? '، ' + city : ''}`,
+                lat: parseFloat(d.lat),
+                lon: parseFloat(d.lon)
+              };
             });
-            setSuggestions(Array.from(new Set(parsedSuggestions)));
+            // Filter unique names
+            const unique = parsedSuggestions.filter((v: any, i: number, a: any) => a.findIndex((t: any) => (t.name === v.name)) === i);
+            setSuggestions(unique);
             setShowSuggestions(true);
           } else {
             setSuggestions([]);
@@ -96,13 +99,64 @@ function RequestServiceContent() {
     setPreviews(prev => prev.filter((_, idx) => idx !== i));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const uploadFile = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("bucket", "prescriptions");
+    
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData
+    });
+    
+    if (!res.ok) throw new Error("Upload failed");
+    const data = await res.json();
+    return data.url;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!locationLat || !locationLng) {
+      setErrorMsg("الرجاء تحديد الموقع الجغرافي على الخريطة");
+      return;
+    }
+    
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setErrorMsg("");
+    
+    try {
+      let prescriptionUrl = null;
+      if (images.length > 0) {
+        prescriptionUrl = await uploadFile(images[0]); // Just uploading first image for simplicity
+      }
+      
+      const payload = {
+        serviceType,
+        description: `Date: ${date} Time: ${time}\nNotes: ${notes}`,
+        budget: parseFloat(budget) || null,
+        locationLat,
+        locationLng,
+        addressText: address,
+        prescriptionUrl
+      };
+      
+      const res = await fetch("/api/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create request");
+      }
+      
       setSubmitted(true);
-    }, 1800);
+    } catch (err: any) {
+      setErrorMsg(err.message || "حدث خطأ ما");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -123,7 +177,7 @@ function RequestServiceContent() {
             {t("follow_my_requests")}
           </button>
           <button
-            onClick={() => router.push('/dashboard/services')}
+            onClick={() => { setSubmitted(false); setNotes(""); setImages([]); setPreviews([]); }}
             className="px-6 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-white rounded-2xl font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
           >
             {t("request_another")}
@@ -148,44 +202,13 @@ function RequestServiceContent() {
         <p className="text-gray-500 dark:text-slate-400 text-sm">{t("request_header_desc")}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Personal Details */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
-          <h3 className="font-bold text-gray-800 dark:text-white text-sm flex items-center gap-2 mb-2">
-            <UserIcon className="w-4 h-4 text-red-500" /> {t("personal_info")}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1.5 block">{t("full_name")}</label>
-              <div className="relative">
-                <input
-                  required
-                  value={fullName}
-                  onChange={e => setFullName(e.target.value)}
-                  placeholder={t("full_name_placeholder")}
-                  className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-10 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors"
-                />
-                <UserIcon className="absolute right-3 top-3.5 w-4 h-4 text-gray-400 dark:text-slate-500" />
-              </div>
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1.5 block">{t("phone")}</label>
-              <div className="relative">
-                <input
-                  required
-                  type="tel"
-                  dir="ltr"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                  placeholder="05XX XX XX XX"
-                  className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-10 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors text-right"
-                />
-                <Phone className="absolute right-3 top-3.5 w-4 h-4 text-gray-400 dark:text-slate-500" />
-              </div>
-            </div>
-          </div>
+      {errorMsg && (
+        <div className="bg-red-50 text-red-600 p-4 rounded-xl font-bold">
+          {errorMsg}
         </div>
+      )}
 
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Location Input */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
           <label className="flex items-center gap-2 font-bold text-gray-800 dark:text-white text-sm">
@@ -199,9 +222,9 @@ function RequestServiceContent() {
                 onChange={e => setAddress(e.target.value)}
                 onFocus={() => address.length > 2 && setShowSuggestions(true)}
                 placeholder={t("search_location_placeholder")}
-                className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-10 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors"
+                className={`w-full border ${locationLat ? 'border-green-400' : 'border-gray-200'} dark:border-slate-700 rounded-2xl px-10 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors`}
               />
-              <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-gray-400 dark:text-slate-500" />
+              <MapPin className={`absolute right-3 top-3.5 w-4 h-4 ${locationLat ? 'text-green-500' : 'text-gray-400'} dark:text-slate-500`} />
               {showSuggestions && suggestions.length > 0 && (
                 <ul className="absolute top-full mt-1 left-0 right-0 z-20 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden">
                   {suggestions.map((s, i) => (
@@ -209,13 +232,15 @@ function RequestServiceContent() {
                       key={i}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 dark:hover:bg-red-500/10 cursor-pointer text-sm text-gray-700 dark:text-gray-300 transition-colors border-b last:border-0 border-gray-100 dark:border-slate-700"
                       onClick={() => { 
-                        setAddress(s); 
+                        setAddress(s.name); 
+                        setLocationLat(s.lat);
+                        setLocationLng(s.lon);
                         setShowSuggestions(false); 
-                        setShowMapModal(true); // Open map when a location is picked from search
+                        setShowMapModal(true); // Open map to verify
                       }}
                     >
                       <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                      {s}
+                      {s.name}
                     </li>
                   ))}
                 </ul>
@@ -235,14 +260,31 @@ function RequestServiceContent() {
           {showMapModal && (
             <div className="mt-4">
               <MapPicker 
-                onLocationSelect={(addr) => {
-                  setAddress(addr);
+                initialCoords={locationLat ? { lat: locationLat, lng: locationLng! } : null}
+                onLocationSelect={(loc) => {
+                  setAddress(loc.address);
+                  setLocationLat(loc.lat);
+                  setLocationLng(loc.lng);
                   setShowMapModal(false);
                 }} 
                 onClose={() => setShowMapModal(false)} 
               />
             </div>
           )}
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
+          <label className="block font-bold text-gray-800 dark:text-white text-sm mb-3">الميزانية المقترحة <span className="font-normal text-gray-400">({t("optional")})</span></label>
+          <div className="relative">
+            <input
+              type="number"
+              value={budget}
+              onChange={e => setBudget(e.target.value)}
+              placeholder="مثال: 1500"
+              className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors"
+            />
+            <span className="absolute left-4 top-3 text-gray-400 text-sm">دج</span>
+          </div>
         </div>
 
         {/* Date & Time */}
@@ -287,7 +329,7 @@ function RequestServiceContent() {
               <span className="text-xs text-gray-400">PNG, JPG, PDF {t("file_size_limit").includes("10") ? t("file_size_limit") : "حتى 10MB"}</span>
             </button>
             <input
-              ref={fileRef} type="file" multiple accept="image/*,.pdf"
+              ref={fileRef} type="file" accept="image/*,.pdf"
               className="hidden" onChange={handleImages}
             />
             {previews.length > 0 && (

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { CheckCircle2, Loader2 } from 'lucide-react';
@@ -14,13 +14,30 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-interface MapPickerProps {
-  onLocationSelect: (address: string) => void;
-  onClose: () => void;
+interface LocationData {
+  address: string;
+  lat: number;
+  lng: number;
 }
 
-// Sub-component to handle map clicks
-function LocationMarker({ position, setPosition, setAddressName, setLoading }: any) {
+interface MapPickerProps {
+  onLocationSelect: (location: LocationData) => void;
+  onClose: () => void;
+  initialCoords?: { lat: number; lng: number } | null;
+}
+
+// Sub-component to handle map clicks and fly to initial coords
+function LocationMarker({ position, setPosition, setAddressName, setLoading, initialCoords }: any) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (initialCoords && !position) {
+      const latlng = new L.LatLng(initialCoords.lat, initialCoords.lng);
+      setPosition(latlng);
+      map.flyTo(latlng, 15);
+    }
+  }, [initialCoords, map, position, setPosition]);
+
   useMapEvents({
     click: async (e) => {
       const { lat, lng } = e.latlng;
@@ -61,7 +78,7 @@ function LocationMarker({ position, setPosition, setAddressName, setLoading }: a
   );
 }
 
-export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps) {
+export default function MapPicker({ onLocationSelect, onClose, initialCoords }: MapPickerProps) {
   const [position, setPosition] = useState<L.LatLng | null>(null);
   const [addressName, setAddressName] = useState<string>("قم بالنقر على الخريطة لتحديد موقعك");
   const [loading, setLoading] = useState(false);
@@ -79,6 +96,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
             setPosition={setPosition} 
             setAddressName={setAddressName} 
             setLoading={setLoading}
+            initialCoords={initialCoords}
           />
         </MapContainer>
       </div>
@@ -99,7 +117,9 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
           onClick={(e) => { 
             e.preventDefault();
             e.stopPropagation();
-            onLocationSelect(addressName);
+            if (position) {
+              onLocationSelect({ address: addressName, lat: position.lat, lng: position.lng });
+            }
             onClose();
           }}
           className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-colors text-sm flex items-center gap-2 pointer-events-auto"

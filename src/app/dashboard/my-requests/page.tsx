@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, CheckCircle2, XCircle, Activity, Brain, Baby, TestTube2, ChevronLeft } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, Activity, Brain, Baby, TestTube2, ChevronLeft, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
@@ -12,19 +12,12 @@ const SERVICE_ICONS: Record<string, React.ReactNode> = {
   "lab-tests": <TestTube2 className="w-5 h-5" />,
 };
 
-// Demo data
-const DEMO_REQUESTS = [
-  { id: 1, type: "physical-therapy", status: "completed", date: "2026-06-20", time: "10:00", address: "الجزائر، بن عكنون", notes: "جلسة تأهيل بعد الإصابة" },
-  { id: 2, type: "psychiatry", status: "completed", date: "2026-06-21", time: "14:30", address: "الجزائر، حيدرة", notes: "استشارة نفسية - الجلسة الأولى" },
-  { id: 3, type: "pediatrics", status: "completed", date: "2026-06-22", time: "09:00", address: "الجزائر، باب الزوار", notes: "فحص دوري للطفل" },
-  { id: 4, type: "lab-tests", status: "completed", date: "2026-06-23", time: "11:00", address: "الجزائر، دالي ابراهيم", notes: "تحليل دم شامل" },
-  { id: 5, type: "lab-tests", status: "pending", date: "2026-06-28", time: "10:00", address: "الجزائر، العاصمة", notes: "تحليل سكر" },
-];
-
 export default function MyRequestsPage() {
   const router = useRouter();
   const { t } = useLanguage();
   const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "completed" | "cancelled">("all");
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Build service labels using translations
   const SERVICE_LABELS: Record<string, string> = {
@@ -39,6 +32,7 @@ export default function MyRequestsPage() {
     confirmed: { label: t("status_confirmed"),        icon: <CheckCircle2 className="w-4 h-4" />,  color: "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30" },
     completed: { label: t("status_completed_label"),  icon: <CheckCircle2 className="w-4 h-4" />,  color: "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/30" },
     cancelled: { label: t("status_cancelled"),        icon: <XCircle className="w-4 h-4" />,       color: "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/30" },
+    accepted:  { label: t("status_confirmed") || "مقبول",       icon: <CheckCircle2 className="w-4 h-4" />,  color: "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30" }
   };
 
   const FILTER_TABS = [
@@ -49,15 +43,36 @@ export default function MyRequestsPage() {
     { key: "cancelled", label: t("filter_cancelled") },
   ];
 
-  const filtered = DEMO_REQUESTS.filter(r => filter === "all" || r.status === filter);
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await fetch("/api/requests");
+        const json = await res.json();
+        if (json.data) {
+          setRequests(json.data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRequests();
+  }, []);
 
-  const handleRequestClick = (req: typeof DEMO_REQUESTS[0]) => {
+  const filtered = requests.filter(r => filter === "all" || r.status === filter || (filter === "confirmed" && r.status === "accepted"));
+
+  const handleRequestClick = (req: any) => {
     if (req.status === "pending") {
       alert(t("pending_alert"));
-    } else if (req.status === "completed" || req.status === "confirmed") {
+    } else if (req.status === "completed" || req.status === "confirmed" || req.status === "accepted") {
       router.push(`/dashboard/treatments/${req.id}`);
     }
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-red-600" /></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -93,7 +108,10 @@ export default function MyRequestsPage() {
       ) : (
         <div className="space-y-4">
           {filtered.map((req) => {
-            const status = STATUS_CONFIG[req.status as keyof typeof STATUS_CONFIG];
+            const statusConfig = STATUS_CONFIG[req.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.pending;
+            const dateStr = new Date(req.created_at).toLocaleDateString('ar-DZ');
+            const timeStr = new Date(req.created_at).toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' });
+
             return (
               <div
                 key={req.id}
@@ -103,43 +121,57 @@ export default function MyRequestsPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      {SERVICE_ICONS[req.type]}
+                      {SERVICE_ICONS[req.service_type] || <Activity className="w-5 h-5" />}
                     </div>
                     <div>
-                      <p className="font-bold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">{SERVICE_LABELS[req.type]}</p>
+                      <p className="font-bold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                        {SERVICE_LABELS[req.service_type] || req.service_type}
+                      </p>
                       <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-                        📅 {req.date} &nbsp;⏰ {req.time}
+                        📅 {dateStr} &nbsp;⏰ {timeStr}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <span className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border ${status.color}`}>
-                      {status.icon} {status.label}
+                    <span className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border ${statusConfig.color}`}>
+                      {statusConfig.icon} {statusConfig.label}
                     </span>
-                    {(req.status === "completed" || req.status === "confirmed") && (
+                    {(req.status === "completed" || req.status === "confirmed" || req.status === "accepted") && (
                       <span className="text-xs text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         {t("details")} <ChevronLeft className="w-3 h-3" />
                       </span>
                     )}
                   </div>
                 </div>
-                {(req.address || req.notes) && (
+                {(req.address_text || req.description || req.budget) && (
                   <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 space-y-1.5">
-                    {req.address && (
+                    {req.address_text && (
                       <p className="text-sm text-gray-600 dark:text-slate-400 flex items-center gap-2">
-                        📍 {req.address}
+                        📍 {req.address_text}
                       </p>
                     )}
-                    {req.notes && (
-                      <p className="text-sm text-gray-600 dark:text-slate-400 flex items-center gap-2">
-                        📝 {req.notes}
+                    {req.budget && (
+                      <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                        💰 الميزانية: {req.budget} دج
+                      </p>
+                    )}
+                    {req.description && (
+                      <p className="text-sm text-gray-600 dark:text-slate-400 flex items-start gap-2">
+                        📝 <span className="whitespace-pre-line">{req.description}</span>
                       </p>
                     )}
                   </div>
                 )}
                 {req.status === "pending" && (
                   <div className="mt-3">
-                    <button className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Add cancellation logic here if needed
+                        alert("سيتم إلغاء الطلب (لم يتم برمجته بعد)");
+                      }}
+                      className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline"
+                    >
                       {t("cancel_request")}
                     </button>
                   </div>
