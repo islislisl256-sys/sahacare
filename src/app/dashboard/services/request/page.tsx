@@ -186,7 +186,11 @@ function RequestServiceContent() {
                     <li
                       key={i}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 dark:hover:bg-red-500/10 cursor-pointer text-sm text-gray-700 dark:text-gray-300 transition-colors border-b last:border-0 border-gray-100 dark:border-slate-700"
-                      onClick={() => { setAddress(s); setShowSuggestions(false); }}
+                      onClick={() => { 
+                        setAddress(s); 
+                        setShowSuggestions(false); 
+                        setShowMapModal(true); // Open map when a location is picked from search
+                      }}
                     >
                       <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0" />
                       {s}
@@ -207,12 +211,20 @@ function RequestServiceContent() {
           
           {/* Mock Map View embedded */}
           {showMapModal && (
-            <div className="w-full h-64 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden relative mt-2 group shadow-inner">
+            <div 
+              className="w-full h-64 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden relative mt-2 group shadow-inner cursor-crosshair"
+              onClick={() => {
+                // Simulate clicking on the map to drop a pin and reverse geocode
+                const mockLocations = ["شارع العربي بن مهيدي، الجزائر العاصمة", "حي 5 جويلية، باب الزوار", "مقام الشهيد، المدنية", "الواجهة البحرية، بومرداس", "حي الياسمين، الشراقة", "القطب الجامعي، القليعة"];
+                const randomLoc = mockLocations[Math.floor(Math.random() * mockLocations.length)];
+                setAddress(randomLoc);
+              }}
+            >
               {/* Map background image */}
               <img src="/map.png" alt="خريطة" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
               
               {/* Center Pin */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 transform group-hover:-translate-y-2">
                 <MapPin className="w-10 h-10 text-red-600 drop-shadow-md -mt-10" fill="currentColor" />
               </div>
               
@@ -220,10 +232,14 @@ function RequestServiceContent() {
               <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
                 <button
                   type="button"
-                  onClick={() => { setAddress("الجزائر، تحديد من الخريطة"); setShowMapModal(false); }}
-                  className="bg-gray-900/90 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-lg backdrop-blur-sm transition-colors text-sm"
+                  onClick={(e) => { 
+                    e.stopPropagation(); // prevent clicking the map behind it
+                    setShowMapModal(false); 
+                    if(!address) setAddress("تم تحديد موقع من الخريطة");
+                  }}
+                  className="bg-gray-900/90 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-lg backdrop-blur-sm transition-colors text-sm flex items-center gap-2"
                 >
-                  تأكيد هذا الموقع
+                  <CheckCircle2 className="w-4 h-4" /> تأكيد الموقع
                 </button>
               </div>
             </div>
