@@ -3,26 +3,13 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, CheckCircle2, XCircle, Activity, Brain, Baby, TestTube2, ChevronLeft } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
   "physical-therapy": <Activity className="w-5 h-5" />,
   "psychiatry": <Brain className="w-5 h-5" />,
   "pediatrics": <Baby className="w-5 h-5" />,
   "lab-tests": <TestTube2 className="w-5 h-5" />,
-};
-
-const SERVICE_LABELS: Record<string, string> = {
-  "physical-therapy": "علاج طبيعي",
-  "psychiatry": "حصة مع طبيب نفسي",
-  "pediatrics": "حصة مع طبيب أطفال",
-  "lab-tests": "تحاليل طبية",
-};
-
-const STATUS_CONFIG = {
-  pending: { label: "قيد المراجعة", icon: <Clock className="w-4 h-4" />, color: "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30" },
-  confirmed: { label: "مؤكد", icon: <CheckCircle2 className="w-4 h-4" />, color: "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30" },
-  completed: { label: "مكتمل", icon: <CheckCircle2 className="w-4 h-4" />, color: "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/30" },
-  cancelled: { label: "ملغي", icon: <XCircle className="w-4 h-4" />, color: "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/30" },
 };
 
 // Demo data
@@ -36,13 +23,37 @@ const DEMO_REQUESTS = [
 
 export default function MyRequestsPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "completed" | "cancelled">("all");
+
+  // Build service labels using translations
+  const SERVICE_LABELS: Record<string, string> = {
+    "physical-therapy": t("service_physical_therapy"),
+    "psychiatry": t("service_psychiatry"),
+    "pediatrics": t("service_pediatrics"),
+    "lab-tests": t("service_lab_tests"),
+  };
+
+  const STATUS_CONFIG = {
+    pending:   { label: t("status_pending"),          icon: <Clock className="w-4 h-4" />,         color: "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30" },
+    confirmed: { label: t("status_confirmed"),        icon: <CheckCircle2 className="w-4 h-4" />,  color: "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30" },
+    completed: { label: t("status_completed_label"),  icon: <CheckCircle2 className="w-4 h-4" />,  color: "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/30" },
+    cancelled: { label: t("status_cancelled"),        icon: <XCircle className="w-4 h-4" />,       color: "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/30" },
+  };
+
+  const FILTER_TABS = [
+    { key: "all",       label: t("filter_all") },
+    { key: "pending",   label: t("filter_pending") },
+    { key: "confirmed", label: t("filter_confirmed") },
+    { key: "completed", label: t("filter_completed") },
+    { key: "cancelled", label: t("filter_cancelled") },
+  ];
 
   const filtered = DEMO_REQUESTS.filter(r => filter === "all" || r.status === filter);
 
   const handleRequestClick = (req: typeof DEMO_REQUESTS[0]) => {
     if (req.status === "pending") {
-      alert("الطلب لا يزال قيد المراجعة ولم يتم إصدار التقرير بعد.");
+      alert(t("pending_alert"));
     } else if (req.status === "completed" || req.status === "confirmed") {
       router.push(`/dashboard/treatments/${req.id}`);
     }
@@ -52,19 +63,13 @@ export default function MyRequestsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-1">طلباتي 📋</h2>
-        <p className="text-gray-500 dark:text-slate-400 text-sm">تابع جميع طلبات الخدمات الصحية الخاصة بك</p>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-1">{t("my_requests_title")}</h2>
+        <p className="text-gray-500 dark:text-slate-400 text-sm">{t("my_requests_desc")}</p>
       </div>
 
       {/* Filter Tabs */}
       <div className="flex gap-2 flex-wrap">
-        {[
-          { key: "all", label: "الكل" },
-          { key: "pending", label: "قيد المراجعة" },
-          { key: "confirmed", label: "مؤكدة" },
-          { key: "completed", label: "مكتملة" },
-          { key: "cancelled", label: "ملغاة" },
-        ].map(tab => (
+        {FILTER_TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key as any)}
@@ -83,15 +88,15 @@ export default function MyRequestsPage() {
       {filtered.length === 0 ? (
         <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-gray-100 dark:border-slate-800 text-center">
           <div className="text-5xl mb-4">📭</div>
-          <p className="text-gray-500 dark:text-slate-400 font-medium">لا توجد طلبات في هذه الفئة</p>
+          <p className="text-gray-500 dark:text-slate-400 font-medium">{t("no_requests_in_category")}</p>
         </div>
       ) : (
         <div className="space-y-4">
           {filtered.map((req) => {
             const status = STATUS_CONFIG[req.status as keyof typeof STATUS_CONFIG];
             return (
-              <div 
-                key={req.id} 
+              <div
+                key={req.id}
                 onClick={() => handleRequestClick(req)}
                 className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer group"
               >
@@ -113,7 +118,7 @@ export default function MyRequestsPage() {
                     </span>
                     {(req.status === "completed" || req.status === "confirmed") && (
                       <span className="text-xs text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        التفاصيل <ChevronLeft className="w-3 h-3" />
+                        {t("details")} <ChevronLeft className="w-3 h-3" />
                       </span>
                     )}
                   </div>
@@ -135,7 +140,7 @@ export default function MyRequestsPage() {
                 {req.status === "pending" && (
                   <div className="mt-3">
                     <button className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline">
-                      إلغاء الطلب
+                      {t("cancel_request")}
                     </button>
                   </div>
                 )}

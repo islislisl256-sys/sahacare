@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { MapPin, Upload, X, FileText, ChevronRight, CheckCircle2, Loader2, Map, User as UserIcon, Phone } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const MapPicker = dynamic(() => import('@/components/MapPicker'), {
   ssr: false,
@@ -20,6 +21,15 @@ const SERVICE_LABELS: Record<string, { label: string; color: string }> = {
 function RequestServiceContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { t } = useLanguage();
+
+  const SERVICE_LABELS: Record<string, { label: string; color: string }> = {
+    "physical-therapy": { label: t("service_physical_therapy"), color: "blue" },
+    "psychiatry":       { label: t("service_psychiatry"),       color: "purple" },
+    "pediatrics":       { label: t("service_pediatrics"),       color: "green" },
+    "lab-tests":        { label: t("service_lab_tests"),        color: "red" },
+  };
+
   const serviceType = searchParams?.get("type") || "physical-therapy";
   const service = SERVICE_LABELS[serviceType] || SERVICE_LABELS["physical-therapy"];
   const isLabTest = serviceType === "lab-tests";
@@ -101,22 +111,22 @@ function RequestServiceContent() {
         <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center">
           <CheckCircle2 className="w-10 h-10 text-green-500" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">تم إرسال طلبك بنجاح! 🎉</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("request_sent_title")}</h2>
         <p className="text-gray-500 dark:text-slate-400 max-w-sm">
-          سيتم التواصل معك قريباً لتأكيد موعد <strong>{service.label}</strong>. يمكنك متابعة حالة طلبك في صفحة الطلبات.
+          {t("request_sent_desc")} <strong>{service.label}</strong>.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => router.push('/dashboard/my-requests')}
             className="px-6 py-3 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 transition-colors"
           >
-            متابعة طلباتي
+            {t("follow_my_requests")}
           </button>
           <button
             onClick={() => router.push('/dashboard/services')}
             className="px-6 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-white rounded-2xl font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
           >
-            طلب خدمة أخرى
+            {t("request_another")}
           </button>
         </div>
       </div>
@@ -127,39 +137,39 @@ function RequestServiceContent() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
-        <span className="hover:text-red-600 cursor-pointer" onClick={() => router.push('/dashboard/services')}>الخدمات</span>
+        <span className="hover:text-red-600 cursor-pointer" onClick={() => router.push('/dashboard/services')}>{t("services_breadcrumb")}</span>
         <ChevronRight className="w-4 h-4" />
         <span className="text-gray-900 dark:text-white font-medium">{service.label}</span>
       </div>
 
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">طلب خدمة: {service.label}</h2>
-        <p className="text-gray-500 dark:text-slate-400 text-sm">يرجى ملء التفاصيل أدناه وسنتواصل معك لتأكيد الموعد</p>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{t("service_request_title")} {service.label}</h2>
+        <p className="text-gray-500 dark:text-slate-400 text-sm">{t("request_header_desc")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Personal Details */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
           <h3 className="font-bold text-gray-800 dark:text-white text-sm flex items-center gap-2 mb-2">
-            <UserIcon className="w-4 h-4 text-red-500" /> المعلومات الشخصية
+            <UserIcon className="w-4 h-4 text-red-500" /> {t("personal_info")}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1.5 block">الاسم الكامل</label>
+              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1.5 block">{t("full_name")}</label>
               <div className="relative">
                 <input
                   required
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
-                  placeholder="الاسم واللقب"
+                  placeholder={t("full_name_placeholder")}
                   className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-10 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors"
                 />
                 <UserIcon className="absolute right-3 top-3.5 w-4 h-4 text-gray-400 dark:text-slate-500" />
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1.5 block">رقم الهاتف</label>
+              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1.5 block">{t("phone")}</label>
               <div className="relative">
                 <input
                   required
@@ -179,7 +189,7 @@ function RequestServiceContent() {
         {/* Location Input */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
           <label className="flex items-center gap-2 font-bold text-gray-800 dark:text-white text-sm">
-            <Map className="w-4 h-4 text-red-500" /> موقعك على الخريطة (الجزائر)
+            <Map className="w-4 h-4 text-red-500" /> {t("location_on_map")}
           </label>
           <div className="flex gap-2 relative">
             <div className="relative flex-1">
@@ -188,7 +198,7 @@ function RequestServiceContent() {
                 value={address}
                 onChange={e => setAddress(e.target.value)}
                 onFocus={() => address.length > 2 && setShowSuggestions(true)}
-                placeholder="ابحث عن ولايتك أو حيك..."
+                placeholder={t("search_location_placeholder")}
                 className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-10 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors"
               />
               <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-gray-400 dark:text-slate-500" />
@@ -215,7 +225,7 @@ function RequestServiceContent() {
               type="button"
               onClick={() => setShowMapModal(true)}
               className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/30 px-4 py-3 rounded-2xl flex items-center justify-center hover:bg-red-100 transition-colors shrink-0"
-              title="تحديد الموقع من الخريطة"
+              title={t("confirm_location")}
             >
               <Map className="w-5 h-5" />
             </button>
@@ -237,10 +247,10 @@ function RequestServiceContent() {
 
         {/* Date & Time */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
-          <label className="block font-bold text-gray-800 dark:text-white text-sm mb-3">📅 الموعد المفضل</label>
+          <label className="block font-bold text-gray-800 dark:text-white text-sm mb-3">{t("preferred_date")}</label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">التاريخ</label>
+              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">{t("date_label")}</label>
               <input
                 required type="date"
                 value={date} onChange={e => setDate(e.target.value)}
@@ -249,7 +259,7 @@ function RequestServiceContent() {
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">الوقت</label>
+              <label className="text-xs text-gray-500 dark:text-slate-400 mb-1 block">{t("time_label")}</label>
               <input
                 required type="time"
                 value={time} onChange={e => setTime(e.target.value)}
@@ -263,18 +273,18 @@ function RequestServiceContent() {
         {isLabTest && (
           <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border-2 border-dashed border-red-200 dark:border-red-500/30 shadow-sm space-y-3">
             <label className="flex items-center gap-2 font-bold text-gray-800 dark:text-white text-sm">
-              <FileText className="w-4 h-4 text-red-500" /> وصفات الطبيب / نتائج سابقة
-              <span className="text-xs font-normal text-gray-400">(اختياري)</span>
+              <FileText className="w-4 h-4 text-red-500" /> {t("doctor_prescriptions")}
+              <span className="text-xs font-normal text-gray-400">({t("optional")})</span>
             </label>
-            <p className="text-xs text-gray-500 dark:text-slate-400">أرفق صور وصفات الطبيب أو نتائج التحاليل السابقة لمساعدة الفريق الطبي</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400">{t("prescriptions_help")}</p>
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
               className="w-full flex flex-col items-center gap-3 py-6 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors cursor-pointer"
             >
               <Upload className="w-7 h-7 text-red-500" />
-              <span className="text-sm font-medium text-red-600 dark:text-red-400">انقر لرفع الصور</span>
-              <span className="text-xs text-gray-400">PNG, JPG, PDF حتى 10MB</span>
+              <span className="text-sm font-medium text-red-600 dark:text-red-400">{t("click_to_upload_short")}</span>
+              <span className="text-xs text-gray-400">PNG, JPG, PDF {t("file_size_limit").includes("10") ? t("file_size_limit") : "حتى 10MB"}</span>
             </button>
             <input
               ref={fileRef} type="file" multiple accept="image/*,.pdf"
@@ -301,12 +311,12 @@ function RequestServiceContent() {
 
         {/* Notes */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm">
-          <label className="block font-bold text-gray-800 dark:text-white text-sm mb-3">📝 ملاحظات إضافية <span className="font-normal text-gray-400">(اختياري)</span></label>
+          <label className="block font-bold text-gray-800 dark:text-white text-sm mb-3">{t("extra_notes")} <span className="font-normal text-gray-400">({t("optional")})</span></label>
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
             rows={3}
-            placeholder="أي معلومات إضافية تريد إضافتها..."
+            placeholder={t("feedback_placeholder")}
             className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 resize-none transition-colors"
           />
         </div>
@@ -317,7 +327,7 @@ function RequestServiceContent() {
           disabled={loading}
           className="w-full py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-bold text-base shadow-lg hover:shadow-red-200 dark:hover:shadow-red-900/30 hover:from-red-700 hover:to-red-800 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
         >
-          {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> جاري الإرسال...</> : "إرسال الطلب"}
+          {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> {t("sending_request")}</> : t("send_request")}
         </button>
       </form>
     </div>

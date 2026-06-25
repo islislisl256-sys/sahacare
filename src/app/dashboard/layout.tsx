@@ -20,8 +20,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     { name: t("patient_dashboard"), href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-    { name: "الخدمات الصحية", href: "/dashboard/services", icon: <HeartPulse className="w-5 h-5" /> },
-    { name: "طلباتي", href: "/dashboard/my-requests", icon: <ClipboardList className="w-5 h-5" /> },
+    { name: t("health_services_nav"), href: "/dashboard/services", icon: <HeartPulse className="w-5 h-5" /> },
+    { name: t("my_requests_nav"), href: "/dashboard/my-requests", icon: <ClipboardList className="w-5 h-5" /> },
     { name: t("family"), href: "/dashboard/family", icon: <Users className="w-5 h-5" /> },
     { name: t("records"), href: "/dashboard/records", icon: <FileText className="w-5 h-5" /> },
     { name: t("profile"), href: "/dashboard/profile", icon: <User className="w-5 h-5" /> },
