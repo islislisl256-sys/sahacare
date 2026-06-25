@@ -37,6 +37,7 @@ export default function ProviderPatientsPage() {
                 <th className="px-6 py-4 font-bold text-center">{t("actions")}</th>
               </tr>
             </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {/* Patient 1 - Pending / In Treatment */}
               <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                 <td className="px-6 py-4">
