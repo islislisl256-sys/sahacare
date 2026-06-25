@@ -56,13 +56,13 @@ export default function ProviderPatientsPage() {
                 <td className="px-6 py-4 text-slate-500 dark:text-slate-400">12 مايو 2026</td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30">
-                    قيد المراجعة
+                    {t("status_under_treatment")}
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex justify-center gap-2">
-                    <a href="/provider/treatments/add/1" className="bg-teal-600 border border-teal-600 text-white hover:bg-teal-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors text-center">إضافة التقرير</a>
-                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">مكالمة</button>
+                    <a href="/provider/treatments/add/1" className="bg-teal-600 border border-teal-600 text-white hover:bg-teal-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors text-center">{t("add_report")}</a>
+                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("call")}</button>
                   </div>
                 </td>
               </tr>
@@ -85,13 +85,13 @@ export default function ProviderPatientsPage() {
                 <td className="px-6 py-4 text-slate-500 dark:text-slate-400">10 مايو 2026</td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
-                    مكتمل
+                    {t("status_completed_provider")}
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex justify-center gap-2">
-                    <a href="/provider/treatments/2" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">عرض التقرير</a>
-                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">مكالمة</button>
+                    <a href="/provider/treatments/2" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("view_report")}</a>
+                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("call")}</button>
                   </div>
                 </td>
               </tr>
@@ -100,7 +100,7 @@ export default function ProviderPatientsPage() {
         </div>
         
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between transition-colors">
-          <p className="text-sm text-slate-500 dark:text-slate-400">عرض 2 من أصل 2 مرضى</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t("showing_patients").replace("{count}", "2").replace("{total}", "2")}</p>
           <div className="flex gap-1">
             <button className="px-3 py-1 border border-slate-200 dark:border-slate-700 rounded text-slate-400 dark:text-slate-500 cursor-not-allowed bg-white dark:bg-slate-900 text-sm transition-colors">{t("previous")}</button>
             <button className="px-3 py-1 border border-slate-200 dark:border-slate-700 rounded text-slate-400 dark:text-slate-500 cursor-not-allowed bg-white dark:bg-slate-900 text-sm transition-colors">{t("next")}</button>

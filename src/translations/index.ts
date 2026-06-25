@@ -264,6 +264,30 @@ export const translations = {
     doctor_prescriptions: "وصفات الطبيب / نتائج سابقة",
     prescriptions_help: "أرفق صور وصفات الطبيب أو نتائج التحاليل السابقة لمساعدة الفريق الطبي",
     click_to_upload_short: "انقر لرفع الصور",
+    // Provider layout + pages
+    verifying_access: "جاري التحقق من الصلاحيات...",
+    // Provider profile page
+    professional_docs: "الوثائق المهنية (للتحقق من الحساب)",
+    university_degree: "الشهادة الجامعية",
+    degree_verified: "تم الرفع والتحقق",
+    add_license: "+ إضافة رخصة مزاولة المهنة (اختياري)",
+    day_off: "يوم راحة",
+    monday: "الاثنين",
+    friday: "الجمعة",
+    // Provider patients page
+    add_report: "إضافة التقرير",
+    call: "مكالمة",
+    view_report: "عرض التقرير",
+    showing_patients: "عرض {count} من أصل {total} مرضى",
+    status_under_treatment: "قيد المراجعة",
+    status_completed_provider: "مكتمل",
+    // Provider specialties
+    specialty_physical: "أخصائي علاج طبيعي",
+    specialty_lab: "مخبر تحاليل طبية",
+    specialty_nurse: "ممرض رعاية منزلية",
+    specialty_doctor: "طبيب عام",
+    bio_placeholder: "اكتب نبذة عن خبراتك، شهاداتك، وطريقة عملك...",
+    work_area_placeholder: "الجزائر العاصمة وضواحيها",
   },
   en: {
     dashboard: "Dashboard",
@@ -530,6 +554,30 @@ export const translations = {
     doctor_prescriptions: "Doctor Prescriptions / Previous Results",
     prescriptions_help: "Attach photos of doctor prescriptions or previous test results to help the medical team",
     click_to_upload_short: "Click to upload photos",
+    // Provider layout + pages
+    verifying_access: "Verifying permissions...",
+    // Provider profile page
+    professional_docs: "Professional Documents (Account Verification)",
+    university_degree: "University Degree",
+    degree_verified: "Uploaded & Verified",
+    add_license: "+ Add Practice License (optional)",
+    day_off: "Day Off",
+    monday: "Monday",
+    friday: "Friday",
+    // Provider patients page
+    add_report: "Add Report",
+    call: "Call",
+    view_report: "View Report",
+    showing_patients: "Showing {count} of {total} patients",
+    status_under_treatment: "Under Review",
+    status_completed_provider: "Completed",
+    // Provider specialties
+    specialty_physical: "Physical Therapy Specialist",
+    specialty_lab: "Medical Lab Technician",
+    specialty_nurse: "Home Care Nurse",
+    specialty_doctor: "General Practitioner",
+    bio_placeholder: "Write about your experience, qualifications, and work style...",
+    work_area_placeholder: "Algiers and surrounding areas",
   },
   fr: {
     dashboard: "Tableau de Bord",
@@ -796,6 +844,30 @@ export const translations = {
     doctor_prescriptions: "Ordonnances / Résultats Précédents",
     prescriptions_help: "Joignez des photos des ordonnances ou des résultats d'analyses précédents pour aider l'équipe médicale",
     click_to_upload_short: "Cliquez pour télécharger des photos",
+    // Provider layout + pages
+    verifying_access: "Vérification des autorisations...",
+    // Provider profile page
+    professional_docs: "Documents Professionnels (Vérification du compte)",
+    university_degree: "Diplôme Universitaire",
+    degree_verified: "Téléchargé & Vérifié",
+    add_license: "+ Ajouter une Licence Professionnelle (optionnel)",
+    day_off: "Jour de Repos",
+    monday: "Lundi",
+    friday: "Vendredi",
+    // Provider patients page
+    add_report: "Ajouter un Rapport",
+    call: "Appel",
+    view_report: "Voir le Rapport",
+    showing_patients: "Affichage de {count} sur {total} patients",
+    status_under_treatment: "En cours d'examen",
+    status_completed_provider: "Terminé",
+    // Provider specialties
+    specialty_physical: "Kinésithérapeute",
+    specialty_lab: "Laborantin Médical",
+    specialty_nurse: "Infirmier à Domicile",
+    specialty_doctor: "Médecin Généraliste",
+    bio_placeholder: "Écrivez sur votre expérience, qualifications et méthode de travail...",
+    work_area_placeholder: "Alger et ses environs",
   }
 };
 

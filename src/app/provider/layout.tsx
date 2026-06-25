@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/context/LanguageContext";
-import { Sun, Moon, Megaphone, Hospital, Star, UserCircle, Shield, LogOut } from "lucide-react";
+import { Sun, Moon, Megaphone, Hospital, Star, UserCircle, Shield, LogOut, User } from "lucide-react";
 
 import ThemeToggle from "@/components/ThemeToggle";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -25,7 +25,7 @@ function ProviderContent({ children }: { children: React.ReactNode }) {
   }, [session, status, router]);
 
   if (status === "loading" || (status === "authenticated" && (session?.user as any)?.role !== "provider")) {
-    return <div className="flex h-screen items-center justify-center bg-white dark:bg-slate-950 text-teal-600 font-bold">جاري التحقق من الصلاحيات...</div>;
+    return <div className="flex h-screen items-center justify-center bg-white dark:bg-slate-950 text-teal-600 font-bold">{t("verifying_access")}</div>;
   }
 
   const navigation = [
@@ -72,19 +72,23 @@ function ProviderContent({ children }: { children: React.ReactNode }) {
           >
             <Shield className="w-4 h-4" /> {t("admin_panel")}
           </Link>
-          <div className="flex items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700">
-            <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center text-teal-700 dark:text-teal-400 font-bold">
+          <Link
+            href="/provider/profile"
+            className="flex items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 hover:bg-teal-50 dark:hover:bg-teal-500/10 hover:border-teal-200 dark:hover:border-teal-500/30 transition-all cursor-pointer group"
+          >
+            <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center text-teal-700 dark:text-teal-400 font-bold group-hover:scale-105 transition-transform">
               {session?.user?.email?.[0]?.toUpperCase() || "P"}
             </div>
-            <div className="mx-3 overflow-hidden">
-              <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+            <div className="mx-3 overflow-hidden flex-1">
+              <p className="text-sm font-medium text-slate-900 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                 {session?.user?.name || t("welcome")}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                 {session?.user?.email}
               </p>
             </div>
-          </div>
+            <User className="w-4 h-4 text-slate-400 dark:text-slate-500 group-hover:text-teal-500 transition-colors shrink-0" />
+          </Link>
         </div>
       </aside>
 
@@ -188,19 +192,24 @@ function ProviderContent({ children }: { children: React.ReactNode }) {
                 >
                   <Shield className="w-4 h-4" /> {t("admin_panel")}
                 </Link>
-                <div className="flex items-center bg-gray-50 dark:bg-slate-800 p-3 rounded-2xl border border-gray-100 dark:border-slate-700">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-700 dark:text-blue-400 font-bold">
+                <Link
+                  href="/provider/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center bg-gray-50 dark:bg-slate-800 p-3 rounded-2xl border border-gray-100 dark:border-slate-700 hover:bg-teal-50 dark:hover:bg-teal-500/10 hover:border-teal-200 dark:hover:border-teal-500/30 transition-all cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center text-teal-700 dark:text-teal-400 font-bold group-hover:scale-105 transition-transform">
                     {session?.user?.email?.[0]?.toUpperCase() || "P"}
                   </div>
-                  <div className="mx-3 overflow-hidden">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {session?.user?.name || t("provider_dashboard")}
+                  <div className="mx-3 overflow-hidden flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      {session?.user?.name || t("welcome")}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {session?.user?.email}
                     </p>
                   </div>
-                </div>
+                  <User className="w-4 h-4 text-gray-400 dark:text-slate-500 group-hover:text-teal-500 transition-colors shrink-0" />
+                </Link>
               </div>
             </aside>
           </div>

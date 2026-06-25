@@ -44,17 +44,17 @@ export default function ProviderProfilePage() {
                 <div>
                   <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("specialty")}</label>
                   <select className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors text-slate-700">
-                    <option>أخصائي علاج طبيعي</option>
-                    <option>مخبر تحاليل طبية</option>
-                    <option>ممرض رعاية منزلية</option>
-                    <option>طبيب عام</option>
+                    <option>{t("specialty_physical")}</option>
+                    <option>{t("specialty_lab")}</option>
+                    <option>{t("specialty_nurse")}</option>
+                    <option>{t("specialty_doctor")}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("bio")}</label>
-                <textarea rows={3} placeholder="اكتب نبذة عن خبراتك، شهاداتك، وطريقة عملك..." className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white resize-none transition-colors"></textarea>
+                <textarea rows={3} placeholder={t("bio_placeholder")} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white resize-none transition-colors"></textarea>
               </div>
             </div>
           </div>
@@ -72,7 +72,7 @@ export default function ProviderProfilePage() {
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("work_area")}</label>
-                <input type="text" placeholder="الجزائر العاصمة وضواحيها" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" />
+                <input type="text" placeholder={t("work_area_placeholder")} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" />
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("default_travel_cost")}</label>
@@ -107,7 +107,7 @@ export default function ProviderProfilePage() {
               <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors">
                 <div className="flex items-center gap-3">
                   <input type="checkbox" defaultChecked className="w-5 h-5 accent-teal-600 rounded" />
-                  <span className="font-bold text-slate-700 dark:text-slate-300 w-20">الاثنين</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-300 w-20">{t("monday")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <input type="time" defaultValue="08:00" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-sm outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" />
@@ -119,16 +119,16 @@ export default function ProviderProfilePage() {
               <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 opacity-60 transition-colors">
                 <div className="flex items-center gap-3">
                   <input type="checkbox" className="w-5 h-5 accent-teal-600 rounded" />
-                  <span className="font-bold text-slate-500 dark:text-slate-400 w-20">الجمعة</span>
+                  <span className="font-bold text-slate-500 dark:text-slate-400 w-20">{t("friday")}</span>
                 </div>
-                <div className="text-sm font-bold text-slate-400 dark:text-slate-500">يوم راحة</div>
+                <div className="text-sm font-bold text-slate-400 dark:text-slate-500">{t("day_off")}</div>
               </div>
             </div>
           </div>
 
           {/* Verification Documents */}
           <div className="pt-8">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6">الوثائق المهنية (للتحقق من الحساب)</h3>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6">{t("professional_docs")}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 p-4 rounded-xl flex items-center justify-between transition-colors">
                 <div className="flex items-center gap-3">
@@ -136,8 +136,8 @@ export default function ProviderProfilePage() {
                     <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <p className="font-bold text-emerald-800 dark:text-emerald-300 text-sm">الشهادة الجامعية</p>
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400">تم الرفع والتحقق</p>
+                    <p className="font-bold text-emerald-800 dark:text-emerald-300 text-sm">{t("university_degree")}</p>
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400">{t("degree_verified")}</p>
                   </div>
                 </div>
                 <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
@@ -145,7 +145,7 @@ export default function ProviderProfilePage() {
               
               <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 border-dashed p-4 rounded-xl flex items-center justify-center cursor-pointer hover:bg-teal-50 dark:hover:bg-teal-500/10 hover:border-teal-200 dark:hover:border-teal-500/30 transition-colors group">
                 <div className="text-center">
-                  <p className="font-bold text-slate-600 dark:text-slate-300 group-hover:text-teal-700 dark:group-hover:text-teal-400 text-sm mb-1">+ إضافة رخصة مزاولة المهنة (اختياري)</p>
+                  <p className="font-bold text-slate-600 dark:text-slate-300 group-hover:text-teal-700 dark:group-hover:text-teal-400 text-sm mb-1">{t("add_license")}</p>
                   <p className="text-xs text-slate-400 dark:text-slate-500">PDF, JPG, PNG (Max: 5MB)</p>
                 </div>
               </div>
