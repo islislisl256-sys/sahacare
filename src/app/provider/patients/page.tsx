@@ -37,8 +37,7 @@ export default function ProviderPatientsPage() {
                 <th className="px-6 py-4 font-bold text-center">{t("actions")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {/* Patient 1 */}
+              {/* Patient 1 - Pending / In Treatment */}
               <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -56,18 +55,18 @@ export default function ProviderPatientsPage() {
                 <td className="px-6 py-4 text-slate-500 dark:text-slate-400">12 مايو 2026</td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30">
-                    {t("in_treatment")}
+                    قيد المراجعة
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex justify-center gap-2">
-                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("medical_record")}</button>
-                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("message")}</button>
+                    <a href="/provider/treatments/add/1" className="bg-teal-600 border border-teal-600 text-white hover:bg-teal-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors text-center">إضافة التقرير</a>
+                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">مكالمة</button>
                   </div>
                 </td>
               </tr>
               
-              {/* Patient 2 */}
+              {/* Patient 2 - Completed */}
               <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -85,13 +84,13 @@ export default function ProviderPatientsPage() {
                 <td className="px-6 py-4 text-slate-500 dark:text-slate-400">10 مايو 2026</td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
-                    {t("completed")}
+                    مكتمل
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex justify-center gap-2">
-                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-500/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("results")}</button>
-                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("note")}</button>
+                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-not-allowed">تمت الإضافة</button>
+                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">مكالمة</button>
                   </div>
                 </td>
               </tr>

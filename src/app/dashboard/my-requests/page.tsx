@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Clock, CheckCircle2, XCircle, Activity, Brain, Baby, TestTube2, ChevronLeft } from "lucide-react";
 
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
@@ -26,15 +27,26 @@ const STATUS_CONFIG = {
 
 // Demo data
 const DEMO_REQUESTS = [
-  { id: 1, type: "lab-tests", status: "pending", date: "2026-07-01", time: "10:00", address: "شارع العروبة، الرياض", notes: "تحليل شامل + صورة دم" },
-  { id: 2, type: "physical-therapy", status: "confirmed", date: "2026-06-28", time: "14:30", address: "شارع الملك فهد، الرياض", notes: "" },
-  { id: 3, type: "psychiatry", status: "completed", date: "2026-06-20", time: "09:00", address: "شارع التحلية، جدة", notes: "جلسة متابعة" },
+  { id: 1, type: "physical-therapy", status: "completed", date: "2026-06-20", time: "10:00", address: "الجزائر، بن عكنون", notes: "جلسة تأهيل بعد الإصابة" },
+  { id: 2, type: "psychiatry", status: "completed", date: "2026-06-21", time: "14:30", address: "الجزائر، حيدرة", notes: "استشارة نفسية - الجلسة الأولى" },
+  { id: 3, type: "pediatrics", status: "completed", date: "2026-06-22", time: "09:00", address: "الجزائر، باب الزوار", notes: "فحص دوري للطفل" },
+  { id: 4, type: "lab-tests", status: "completed", date: "2026-06-23", time: "11:00", address: "الجزائر، دالي ابراهيم", notes: "تحليل دم شامل" },
+  { id: 5, type: "lab-tests", status: "pending", date: "2026-06-28", time: "10:00", address: "الجزائر، العاصمة", notes: "تحليل سكر" },
 ];
 
 export default function MyRequestsPage() {
+  const router = useRouter();
   const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "completed" | "cancelled">("all");
 
   const filtered = DEMO_REQUESTS.filter(r => filter === "all" || r.status === filter);
+
+  const handleRequestClick = (req: typeof DEMO_REQUESTS[0]) => {
+    if (req.status === "pending") {
+      alert("الطلب لا يزال قيد المراجعة ولم يتم إصدار التقرير بعد.");
+    } else if (req.status === "completed" || req.status === "confirmed") {
+      router.push(`/dashboard/treatments/${req.id}`);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -78,22 +90,33 @@ export default function MyRequestsPage() {
           {filtered.map((req) => {
             const status = STATUS_CONFIG[req.status as keyof typeof STATUS_CONFIG];
             return (
-              <div key={req.id} className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+              <div 
+                key={req.id} 
+                onClick={() => handleRequestClick(req)}
+                className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                       {SERVICE_ICONS[req.type]}
                     </div>
                     <div>
-                      <p className="font-bold text-gray-900 dark:text-white">{SERVICE_LABELS[req.type]}</p>
+                      <p className="font-bold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">{SERVICE_LABELS[req.type]}</p>
                       <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
                         📅 {req.date} &nbsp;⏰ {req.time}
                       </p>
                     </div>
                   </div>
-                  <span className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border ${status.color}`}>
-                    {status.icon} {status.label}
-                  </span>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border ${status.color}`}>
+                      {status.icon} {status.label}
+                    </span>
+                    {(req.status === "completed" || req.status === "confirmed") && (
+                      <span className="text-xs text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        التفاصيل <ChevronLeft className="w-3 h-3" />
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {(req.address || req.notes) && (
                   <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 space-y-1.5">
