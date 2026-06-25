@@ -9,7 +9,7 @@ export const translations = {
     available_jobs: "الطلبات المتاحة",
     my_patients: "المرضى الحاليين",
     subscription: "إدارة الاشتراك",
-    profile: "الملف المهني",
+    profile: "الملف الشخصي",
     admin_panel: "لوحة الإدارة (دخول آمن)",
     logout: "تسجيل الخروج",
     welcome: "مرحباً",
