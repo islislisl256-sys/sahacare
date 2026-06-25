@@ -2,7 +2,13 @@
 
 import { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { MapPin, Upload, X, FileText, ChevronRight, CheckCircle2, Loader2, Map, User as UserIcon, Phone } from "lucide-react";
+
+const MapPicker = dynamic(() => import('@/components/MapPicker'), {
+  ssr: false,
+  loading: () => <div className="h-64 w-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700"><Loader2 className="w-6 h-6 animate-spin text-red-500" /></div>
+});
 
 const SERVICE_LABELS: Record<string, { label: string; color: string }> = {
   "physical-therapy": { label: "علاج طبيعي", color: "blue" },
@@ -33,30 +39,36 @@ function RequestServiceContent() {
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Simulate Google Maps autocomplete for Algeria
-  const mockSuggestions = [
-    "الجزائر العاصمة، شارع ديدوش مراد",
-    "الجزائر العاصمة، حي باب الزوار",
-    "الجزائر العاصمة، الشراقة",
-    "البليدة، وسط المدينة",
-    "وهران، واجهة البحر",
-    "قسنطينة، سيدي مبروك",
-    "سطيف، بارك مال",
-    "عنابة، الكورنيش",
-    "تلمسان، منصورة",
-    "باتنة، الممرات",
-  ];
-
   useEffect(() => {
-    if (address.length > 2) {
-      const filtered = mockSuggestions.filter(s =>
-        s.toLowerCase().includes(address.toLowerCase()) || address.length > 3
-      );
-      setSuggestions(filtered.slice(0, 4));
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-    }
+    const fetchSuggestions = async () => {
+      if (address.length > 2 && !address.includes("تحديد")) {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ' الجزائر')}&limit=4&addressdetails=1`);
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const parsedSuggestions = data.map((d: any) => {
+              const name = d.address.road || d.name;
+              const city = d.address.city || d.address.town || d.address.state;
+              return `${name}${city ? '، ' + city : ''}`;
+            });
+            setSuggestions(Array.from(new Set(parsedSuggestions)));
+            setShowSuggestions(true);
+          } else {
+            setSuggestions([]);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        setShowSuggestions(false);
+      }
+    };
+
+    const delayDebounceFn = setTimeout(() => {
+      fetchSuggestions();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
   }, [address]);
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -209,39 +221,16 @@ function RequestServiceContent() {
             </button>
           </div>
           
-          {/* Mock Map View embedded */}
+          {/* Real Interactive Map View */}
           {showMapModal && (
-            <div 
-              className="w-full h-64 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden relative mt-2 group shadow-inner cursor-crosshair"
-              onClick={() => {
-                // Simulate clicking on the map to drop a pin and reverse geocode
-                const mockLocations = ["شارع العربي بن مهيدي، الجزائر العاصمة", "حي 5 جويلية، باب الزوار", "مقام الشهيد، المدنية", "الواجهة البحرية، بومرداس", "حي الياسمين، الشراقة", "القطب الجامعي، القليعة"];
-                const randomLoc = mockLocations[Math.floor(Math.random() * mockLocations.length)];
-                setAddress(randomLoc);
-              }}
-            >
-              {/* Map background image */}
-              <img src="/map.png" alt="خريطة" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-              
-              {/* Center Pin */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 transform group-hover:-translate-y-2">
-                <MapPin className="w-10 h-10 text-red-600 drop-shadow-md -mt-10" fill="currentColor" />
-              </div>
-              
-              {/* Overlay UI */}
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
-                <button
-                  type="button"
-                  onClick={(e) => { 
-                    e.stopPropagation(); // prevent clicking the map behind it
-                    setShowMapModal(false); 
-                    if(!address) setAddress("تم تحديد موقع من الخريطة");
-                  }}
-                  className="bg-gray-900/90 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-lg backdrop-blur-sm transition-colors text-sm flex items-center gap-2"
-                >
-                  <CheckCircle2 className="w-4 h-4" /> تأكيد الموقع
-                </button>
-              </div>
+            <div className="mt-4">
+              <MapPicker 
+                onLocationSelect={(addr) => {
+                  setAddress(addr);
+                  setShowMapModal(false);
+                }} 
+                onClose={() => setShowMapModal(false)} 
+              />
             </div>
           )}
         </div>
