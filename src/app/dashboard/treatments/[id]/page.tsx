@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { User, Activity, FileText, Calendar, Clock, MapPin, ChevronRight, Download, Brain, Baby, TestTube2, Image as ImageIcon, Star, MessageSquare } from "lucide-react";
 import React, { useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
   "physical-therapy": <Activity className="w-6 h-6" />,
@@ -67,6 +68,7 @@ const MOCK_TREATMENTS: Record<string, any> = {
 export default function TreatmentDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const id = params?.id as string;
   
   const treatment = MOCK_TREATMENTS[id];
@@ -79,8 +81,8 @@ export default function TreatmentDetailsPage() {
   if (!treatment) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-white">لم يتم العثور على التقرير</h2>
-        <button onClick={() => router.push('/dashboard/my-requests')} className="mt-4 text-red-600 hover:underline">العودة لطلباتي</button>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{t("report_not_found")}</h2>
+        <button onClick={() => router.push('/dashboard/my-requests')} className="mt-4 text-red-600 hover:underline">{t("back_to_requests")}</button>
       </div>
     );
   }
@@ -89,9 +91,9 @@ export default function TreatmentDetailsPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-        <span className="hover:text-red-600 cursor-pointer transition-colors" onClick={() => router.push('/dashboard/my-requests')}>طلباتي</span>
+        <span className="hover:text-red-600 cursor-pointer transition-colors" onClick={() => router.push('/dashboard/my-requests')}>{t("my_requests")}</span>
         <ChevronRight className="w-4 h-4" />
-        <span className="text-slate-900 dark:text-white font-medium">تقرير: {treatment.title}</span>
+        <span className="text-slate-900 dark:text-white font-medium">{t("report_prefix")} {treatment.title}</span>
       </div>
 
       {/* Header Info */}
@@ -110,7 +112,7 @@ export default function TreatmentDetailsPage() {
             </div>
           </div>
           <span className="bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 px-3 py-1 rounded-full text-xs font-bold">
-            مكتمل
+            {t("treatment_completed")}
           </span>
         </div>
       </div>
@@ -119,7 +121,7 @@ export default function TreatmentDetailsPage() {
         {/* Patient Details */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-            <User className="w-5 h-5 text-red-500" /> معلومات المريض
+            <User className="w-5 h-5 text-red-500" /> {t("patient_info")}
           </h3>
           <p className="font-medium text-slate-900 dark:text-white text-lg">{treatment.patientName}</p>
         </div>
@@ -127,7 +129,7 @@ export default function TreatmentDetailsPage() {
         {/* Provider Details */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-teal-500" /> مقدم الخدمة
+            <Activity className="w-5 h-5 text-teal-500" /> {t("service_provider")}
           </h3>
           <p className="font-bold text-slate-900 dark:text-white text-lg">{treatment.providerName}</p>
           <p className="text-sm text-slate-500 dark:text-slate-400">{treatment.providerSpecialty}</p>
@@ -137,18 +139,18 @@ export default function TreatmentDetailsPage() {
       {/* Medical Report */}
       <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2 text-lg">
-          <FileText className="w-6 h-6 text-red-500" /> التقرير الطبي
+          <FileText className="w-6 h-6 text-red-500" /> {t("medical_report")}
         </h3>
         
         <div className="space-y-6">
           <div className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-800/50">
-            <h4 className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-2">التشخيص والتفاصيل</h4>
+            <h4 className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-2">{t("diagnosis_details")}</h4>
             <p className="text-slate-800 dark:text-slate-200 leading-relaxed text-base">{treatment.report}</p>
           </div>
 
           {treatment.notes && (
             <div className="bg-amber-50 dark:bg-amber-500/5 p-5 rounded-2xl border border-amber-100 dark:border-amber-500/10">
-              <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400 mb-2">ملاحظات هامة / توصيات</h4>
+              <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400 mb-2">{t("important_notes")}</h4>
               <p className="text-amber-900 dark:text-amber-200 leading-relaxed text-base">{treatment.notes}</p>
             </div>
           )}
@@ -160,10 +162,10 @@ export default function TreatmentDetailsPage() {
         <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-lg">
-              <ImageIcon className="w-6 h-6 text-blue-500" /> نتيجة التحاليل المرفقة
+              <ImageIcon className="w-6 h-6 text-blue-500" /> {t("lab_result_attached")}
             </h3>
             <button className="flex items-center gap-2 text-sm font-bold text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 px-4 py-2 rounded-xl transition-colors">
-              <Download className="w-4 h-4" /> تحميل
+              <Download className="w-4 h-4" /> {t("download")}
             </button>
           </div>
           
@@ -180,13 +182,13 @@ export default function TreatmentDetailsPage() {
       {/* Rating & Patient Feedback Section */}
       <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors mt-6">
         <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2 text-lg">
-          <MessageSquare className="w-6 h-6 text-indigo-500" /> تقييمك ورأيك في الخدمة
+          <MessageSquare className="w-6 h-6 text-indigo-500" /> {t("rating_section_title")}
         </h3>
 
         {submittedFeedback ? (
           <div className="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 p-6 rounded-2xl text-center">
-            <h4 className="font-bold text-indigo-700 dark:text-indigo-400 mb-2">شكراً لتقييمك!</h4>
-            <p className="text-sm text-indigo-600/80 dark:text-indigo-300/80 mb-4">تم إرسال تقييمك وملاحظاتك إلى مقدم الخدمة.</p>
+            <h4 className="font-bold text-indigo-700 dark:text-indigo-400 mb-2">{t("rating_thanks")}</h4>
+            <p className="text-sm text-indigo-600/80 dark:text-indigo-300/80 mb-4">{t("rating_sent")}</p>
             <div className="flex justify-center gap-1 mb-4">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star key={star} className={`w-6 h-6 ${star <= rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-700'}`} />
@@ -201,7 +203,7 @@ export default function TreatmentDetailsPage() {
         ) : (
           <div className="space-y-6">
             <div className="space-y-3">
-              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block">كيف تقيم تجربتك مع {treatment.providerName}؟</label>
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block">{t("rating_label")} {treatment.providerName}؟</label>
               <div className="flex items-center gap-2" dir="ltr">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -225,11 +227,11 @@ export default function TreatmentDetailsPage() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block">هل لديك أي ملاحظات أو تقرير خاص بك تود إضافته؟ (اختياري)</label>
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block">{t("feedback_label")}</label>
               <textarea
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                placeholder="اكتب ملاحظاتك هنا..."
+                placeholder={t("feedback_placeholder")}
                 rows={4}
                 className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-sm outline-none focus:border-indigo-500 transition-colors text-slate-900 dark:text-white resize-none"
               />
@@ -240,7 +242,7 @@ export default function TreatmentDetailsPage() {
               disabled={rating === 0}
               className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              إرسال التقييم
+              {t("submit_rating")}
             </button>
           </div>
         )}

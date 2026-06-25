@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { User, Activity, FileText, Calendar, Clock, ChevronRight, Download, Brain, Baby, TestTube2, Image as ImageIcon, Star, MessageSquare } from "lucide-react";
 import React from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
   "physical-therapy": <Activity className="w-6 h-6" />,
@@ -31,6 +32,7 @@ const MOCK_TREATMENTS: Record<string, any> = {
 export default function ProviderTreatmentViewPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const id = params?.id as string;
   
   // Defaulting to 2 just for the mock presentation if they click on patient 2
@@ -40,9 +42,9 @@ export default function ProviderTreatmentViewPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-        <span className="hover:text-teal-600 cursor-pointer transition-colors" onClick={() => router.push('/provider/patients')}>المرضى</span>
+        <span className="hover:text-teal-600 cursor-pointer transition-colors" onClick={() => router.push('/provider/patients')}>{t("my_patients")}</span>
         <ChevronRight className="w-4 h-4" />
-        <span className="text-slate-900 dark:text-white font-medium">تقرير العلاج المكتمل</span>
+        <span className="text-slate-900 dark:text-white font-medium">{t("completed_treatment_report")}</span>
       </div>
 
       {/* Header Info */}
@@ -61,7 +63,7 @@ export default function ProviderTreatmentViewPage() {
             </div>
           </div>
           <span className="bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 px-3 py-1 rounded-full text-xs font-bold">
-            مكتمل
+            {t("treatment_completed")}
           </span>
         </div>
       </div>
@@ -69,7 +71,7 @@ export default function ProviderTreatmentViewPage() {
       {/* Patient Info */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-          <User className="w-5 h-5 text-teal-500" /> معلومات المريض
+          <User className="w-5 h-5 text-teal-500" /> {t("patient_info")}
         </h3>
         <p className="font-medium text-slate-900 dark:text-white text-lg">{treatment.patientName}</p>
       </div>
@@ -78,7 +80,7 @@ export default function ProviderTreatmentViewPage() {
       {(treatment.rating || treatment.feedback) && (
         <div className="bg-indigo-50 dark:bg-indigo-900/10 p-6 rounded-3xl border border-indigo-100 dark:border-indigo-800/30 shadow-sm transition-colors">
           <h3 className="font-bold text-indigo-900 dark:text-indigo-100 mb-4 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-indigo-500" /> رأي المريض بالخدمة
+            <MessageSquare className="w-5 h-5 text-indigo-500" /> {t("patient_review")}
           </h3>
           <div className="flex gap-1 mb-3">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -96,16 +98,16 @@ export default function ProviderTreatmentViewPage() {
       {/* Medical Report Submitted */}
       <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
         <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2 text-lg">
-          <FileText className="w-6 h-6 text-teal-500" /> التقرير الطبي الذي أضفته
+          <FileText className="w-6 h-6 text-teal-500" /> {t("my_medical_report")}
         </h3>
         <div className="space-y-6">
           <div className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-800/50">
-            <h4 className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-2">التشخيص والتفاصيل</h4>
+            <h4 className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-2">{t("diagnosis_details")}</h4>
             <p className="text-slate-800 dark:text-slate-200 leading-relaxed text-base">{treatment.report}</p>
           </div>
           {treatment.notes && (
             <div className="bg-amber-50 dark:bg-amber-500/5 p-5 rounded-2xl border border-amber-100 dark:border-amber-500/10">
-              <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400 mb-2">ملاحظات هامة / توصيات</h4>
+              <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400 mb-2">{t("important_notes")}</h4>
               <p className="text-amber-900 dark:text-amber-200 leading-relaxed text-base">{treatment.notes}</p>
             </div>
           )}
@@ -117,7 +119,7 @@ export default function ProviderTreatmentViewPage() {
         <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-lg">
-              <ImageIcon className="w-6 h-6 text-blue-500" /> المرفقات
+              <ImageIcon className="w-6 h-6 text-blue-500" /> {t("attachments")}
             </h3>
           </div>
           <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">

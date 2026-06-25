@@ -3,9 +3,11 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FileText, CheckCircle2, ChevronRight, Upload, X, Loader2, User, Activity } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AddTreatmentPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   
   const [report, setReport] = useState("");
   const [notes, setNotes] = useState("");
@@ -45,15 +47,15 @@ export default function AddTreatmentPage() {
         <div className="w-20 h-20 rounded-full bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center">
           <CheckCircle2 className="w-10 h-10 text-teal-600 dark:text-teal-400" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">تم إضافة التقرير بنجاح!</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t("report_added_success")}</h2>
         <p className="text-slate-500 dark:text-slate-400 max-w-sm">
-          تم تحديث حالة الطلب إلى مكتمل، ويمكن للمريض الآن الاطلاع على التقرير.
+          {t("report_added_desc")}
         </p>
         <button
           onClick={() => router.push('/provider/patients')}
           className="px-6 py-3 bg-teal-600 text-white rounded-2xl font-bold hover:bg-teal-700 transition-colors mt-4"
         >
-          العودة لقائمة المرضى
+          {t("back_to_patients")}
         </button>
       </div>
     );
@@ -63,9 +65,9 @@ export default function AddTreatmentPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-        <span className="hover:text-teal-600 cursor-pointer transition-colors" onClick={() => router.push('/provider/patients')}>إدارة المرضى</span>
+        <span className="hover:text-teal-600 cursor-pointer transition-colors" onClick={() => router.push('/provider/patients')}>{t("manage_patients")}</span>
         <ChevronRight className="w-4 h-4" />
-        <span className="text-slate-900 dark:text-white font-medium">إضافة تقرير علاج</span>
+        <span className="text-slate-900 dark:text-white font-medium">{t("add_treatment_report")}</span>
       </div>
 
       {/* Header Info */}
@@ -85,7 +87,7 @@ export default function AddTreatmentPage() {
         </div>
         <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-400 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
-          الحالة: قيد المراجعة
+          {t("status_under_review")}
         </div>
       </div>
 
@@ -95,9 +97,9 @@ export default function AddTreatmentPage() {
           <div>
             <label className="flex items-center gap-2 font-bold text-slate-800 dark:text-white text-base mb-2">
               <FileText className="w-5 h-5 text-teal-600 dark:text-teal-400" /> 
-              تفاصيل التقرير الطبي
+              {t("medical_report_details")}
             </label>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">اكتب وصفاً مفصلاً للإجراءات التي تمت خلال الجلسة أو العلاج.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t("report_description")}</p>
           </div>
           
           <textarea
@@ -110,12 +112,12 @@ export default function AddTreatmentPage() {
           />
 
           <div className="pt-2">
-            <label className="block font-bold text-slate-800 dark:text-white text-sm mb-2">ملاحظات للمريض <span className="text-slate-400 font-normal">(اختياري)</span></label>
+            <label className="block font-bold text-slate-800 dark:text-white text-sm mb-2">{t("notes_for_patient")} <span className="text-slate-400 font-normal">({t("optional")})</span></label>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
               rows={2}
-              placeholder="نصائح أو أدوية يرجى الالتزام بها..."
+              placeholder={t("notes_placeholder")}
               className="w-full border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-teal-500 resize-none transition-colors"
             />
           </div>
@@ -126,10 +128,10 @@ export default function AddTreatmentPage() {
           <div>
             <label className="flex items-center gap-2 font-bold text-slate-800 dark:text-white text-base mb-1">
               <Upload className="w-5 h-5 text-teal-600 dark:text-teal-400" /> 
-              مرفقات ونتائج التحاليل
-              <span className="text-xs font-normal text-slate-400 mr-2 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">(اختياري)</span>
+              {t("attachments_results")}
+              <span className="text-xs font-normal text-slate-400 mr-2 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">({t("optional")})</span>
             </label>
-            <p className="text-sm text-slate-500 dark:text-slate-400">إذا كان العلاج يتضمن تحاليل أو أشعة، قم برفع الصور هنا لكي يتمكن المريض من رؤيتها.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t("attachments_desc")}</p>
           </div>
 
           <button
@@ -141,8 +143,8 @@ export default function AddTreatmentPage() {
               <Upload className="w-6 h-6 text-teal-600 dark:text-teal-400" />
             </div>
             <div className="text-center">
-              <span className="text-sm font-bold text-teal-700 dark:text-teal-400 block mb-1">انقر هنا لرفع الصور أو الملفات</span>
-              <span className="text-xs text-slate-400">PNG, JPG, PDF (بحد أقصى 10MB)</span>
+              <span className="text-sm font-bold text-teal-700 dark:text-teal-400 block mb-1">{t("click_to_upload")}</span>
+              <span className="text-xs text-slate-400">{t("file_size_limit")}</span>
             </div>
           </button>
           <input
@@ -177,9 +179,9 @@ export default function AddTreatmentPage() {
             disabled={loading || !report}
             className="w-full py-4 bg-teal-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:bg-teal-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> جاري حفظ التقرير...</> : "حفظ وإنهاء العلاج"}
+            {loading ? <><Loader2 className="w-5 h-5 animate-spin" />{t("saving_report")}</> : t("save_finish_treatment")}
           </button>
-          <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-3">بمجرد الحفظ، سيتم إشعار المريض بإكتمال الخدمة.</p>
+          <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-3">{t("patient_notified")}</p>
         </div>
       </form>
     </div>
