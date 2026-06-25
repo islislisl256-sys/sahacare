@@ -304,6 +304,12 @@ export const translations = {
     clinic_feat_2: "ظهور مميز في أعلى نتائج البحث",
     clinic_feat_3: "إحصائيات متقدمة وتقارير مالية",
     clinic_feat_4: "مدير حساب مخصص",
+    // Provider Dashboard Home Mock Jobs
+    less_than_5km: "أقل من 5 كم",
+    job_1_title: "جلسات تأهيل حركي لكبير في السن بعد جراحة",
+    job_1_desc: "المريض يعاني من صعوبة في المشي بعد عملية جراحية لتغيير مفصل الركبة، نحتاج إلى 3 جلسات أسبوعياً لمدة شهر. المريض يتوفر لديه السجل الطبي الكامل والأشعة. يفضل معالج ذكر.",
+    job_2_title: "سحب عينة دم بالمنزل (تحليل شامل)",
+    job_2_desc: "أحتاج ممرض أو مخبري لسحب عينة دم لوالدتي في المنزل صباح الغد في أقرب وقت. الوصفة الطبية مرفقة مع الطلب.",
   },
   en: {
     dashboard: "Dashboard",
@@ -610,6 +616,12 @@ export const translations = {
     clinic_feat_2: "Featured placement at the top of search results",
     clinic_feat_3: "Advanced analytics and financial reports",
     clinic_feat_4: "Dedicated account manager",
+    // Provider Dashboard Home Mock Jobs
+    less_than_5km: "Less than 5 km",
+    job_1_title: "Physical therapy sessions for an elderly after surgery",
+    job_1_desc: "The patient has difficulty walking after a knee replacement surgery. We need 3 sessions a week for a month. The patient has a full medical record and X-rays. A male therapist is preferred.",
+    job_2_title: "Home blood draw (comprehensive test)",
+    job_2_desc: "I need a nurse or lab technician to draw blood for my mother at home tomorrow morning as soon as possible. The prescription is attached to the request.",
   },
   fr: {
     dashboard: "Tableau de Bord",
@@ -916,6 +928,12 @@ export const translations = {
     clinic_feat_2: "Placement en vedette en haut des résultats de recherche",
     clinic_feat_3: "Analyses avancées et rapports financiers",
     clinic_feat_4: "Gestionnaire de compte dédié",
+    // Provider Dashboard Home Mock Jobs
+    less_than_5km: "Moins de 5 km",
+    job_1_title: "Séances de kinésithérapie pour une personne âgée après une chirurgie",
+    job_1_desc: "Le patient a des difficultés à marcher après une opération de remplacement du genou. Nous avons besoin de 3 séances par semaine pendant un mois. Le patient dispose d'un dossier médical complet et de radiographies. Un thérapeute masculin est préféré.",
+    job_2_title: "Prélèvement sanguin à domicile (bilan complet)",
+    job_2_desc: "J'ai besoin d'un infirmier ou d'un technicien de laboratoire pour faire une prise de sang pour ma mère à la maison demain matin dès que possible. L'ordonnance est jointe à la demande.",
   }
 };
 
