@@ -64,19 +64,23 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           >
             <Shield className="w-4 h-4" /> {t("admin_panel")}
           </Link>
-          <div className="flex items-center bg-gray-50 dark:bg-slate-800 p-3 rounded-2xl border border-gray-100 dark:border-slate-700">
-            <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-700 dark:text-red-400 font-bold">
+          <Link
+            href="/dashboard/profile"
+            className="flex items-center bg-gray-50 dark:bg-slate-800 p-3 rounded-2xl border border-gray-100 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-500/10 hover:border-red-200 dark:hover:border-red-500/30 transition-all cursor-pointer group"
+          >
+            <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-700 dark:text-red-400 font-bold group-hover:scale-105 transition-transform">
               {session?.user?.email?.[0]?.toUpperCase() || "U"}
             </div>
-            <div className="mx-3 overflow-hidden">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+            <div className="mx-3 overflow-hidden flex-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                 {session?.user?.name || t("welcome")}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {session?.user?.email}
               </p>
             </div>
-          </div>
+            <User className="w-4 h-4 text-gray-400 dark:text-slate-500 group-hover:text-red-500 transition-colors shrink-0" />
+          </Link>
         </div>
       </aside>
 
@@ -169,19 +173,24 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 >
                   <Shield className="w-4 h-4" /> {t("admin_panel")}
                 </Link>
-                <div className="flex items-center bg-gray-50 dark:bg-slate-800 p-3 rounded-2xl border border-gray-100 dark:border-slate-700">
-                  <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-700 dark:text-red-400 font-bold">
+                <Link
+                  href="/dashboard/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center bg-gray-50 dark:bg-slate-800 p-3 rounded-2xl border border-gray-100 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-500/10 hover:border-red-200 dark:hover:border-red-500/30 transition-all cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-700 dark:text-red-400 font-bold group-hover:scale-105 transition-transform">
                     {session?.user?.email?.[0]?.toUpperCase() || "U"}
                   </div>
-                  <div className="mx-3 overflow-hidden">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  <div className="mx-3 overflow-hidden flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                       {session?.user?.name || t("welcome")}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {session?.user?.email}
                     </p>
                   </div>
-                </div>
+                  <User className="w-4 h-4 text-gray-400 dark:text-slate-500 group-hover:text-red-500 transition-colors shrink-0" />
+                </Link>
               </div>
             </aside>
           </div>
