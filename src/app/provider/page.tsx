@@ -3,9 +3,11 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { Megaphone, Hourglass, DollarSign, MapPin, Clock, FileText, Loader2, X, CheckCircle2, Briefcase } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProviderDashboard() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [distance, setDistance] = useState(20); // Add distance state
