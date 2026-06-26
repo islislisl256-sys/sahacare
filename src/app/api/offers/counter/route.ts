@@ -30,17 +30,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Offer not found" }, { status: 404 });
     }
 
+    const offerData = offer as any;
     let newStatus = "";
 
     if (role === "patient") {
       // Verify patient owns the request
-      if (offer.request?.patient_id !== userId) {
+      if (offerData.request?.patient_id !== userId) {
         return NextResponse.json({ error: "Unauthorized to counter this offer" }, { status: 403 });
       }
       newStatus = "countered_by_patient";
     } else if (role === "provider") {
       // Verify provider owns the offer
-      if (offer.provider_id !== userId) {
+      if (offerData.provider_id !== userId) {
         return NextResponse.json({ error: "Unauthorized to counter this offer" }, { status: 403 });
       }
       newStatus = "countered_by_provider";
@@ -49,11 +50,10 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Update offer price, message, and status
-    const { data: updatedOffer, error: updateError } = await supabaseAdmin
-      .from("offers")
+    const { data: updatedOffer, error: updateError } = await (supabaseAdmin.from("offers") as any)
       .update({
         price,
-        message: message || offer.message, // keep old message if new one is empty
+        message: message || offerData.message, // keep old message if new one is empty
         status: newStatus
       })
       .eq("id", offerId)
