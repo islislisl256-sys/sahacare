@@ -21,7 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       .single();
 
     // It's okay if profile doesn't exist for some reason, we just return the user basic info
-    return NextResponse.json({ data: { ...user, profile: profile || null } });
+    return NextResponse.json({ data: { ...(user as any), profile: profile || null } });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
