@@ -25,8 +25,7 @@ export async function POST(req: NextRequest) {
 
     // Ensure user exists in public.users to prevent foreign key constraint errors
     // if they signed up before the database triggers were created.
-    const { error: userError } = await supabaseAdmin
-      .from("users")
+    const { error: userError } = await (supabaseAdmin.from("users") as any)
       .upsert({
         id: patientId,
         email: session.user.email,
@@ -38,8 +37,7 @@ export async function POST(req: NextRequest) {
       console.warn("Could not upsert user, proceeding anyway:", userError);
     }
 
-    const { data, error } = await supabaseAdmin
-      .from("service_requests")
+    const { data, error } = await (supabaseAdmin.from("service_requests") as any)
       .insert({
         patient_id: patientId,
         service_type: serviceType,
@@ -86,21 +84,21 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const filter = searchParams.get("filter");
 
-    let query = supabaseAdmin.from("service_requests").select("*, patient:users(name, avatar_url, phone)");
+    let data, error;
 
     if (role === "patient") {
-      query = query.eq("patient_id", userId);
+      const res = await supabaseAdmin.from("service_requests").select("*, patient:users(name, avatar_url, phone)")
+        .eq("patient_id", userId).order('created_at', { ascending: false });
+      data = res.data; error = res.error;
     } else if (role === "provider") {
-      if (filter === "nearby") {
-        query = query.eq("status", "pending");
-        // Simplified nearby logic (since we don't have user's location sent in GET yet)
-        // A true app would use PostGIS ST_DWithin here.
-      } else {
-        query = query.eq("status", "pending");
-      }
+      const res = await supabaseAdmin.from("service_requests").select("*, patient:users(name, avatar_url, phone)")
+        .eq("status", "pending").order('created_at', { ascending: false });
+      data = res.data; error = res.error;
+    } else {
+      const res = await supabaseAdmin.from("service_requests").select("*, patient:users(name, avatar_url, phone)")
+        .order('created_at', { ascending: false });
+      data = res.data; error = res.error;
     }
-
-    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) throw error;
 

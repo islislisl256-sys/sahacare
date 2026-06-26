@@ -45,8 +45,7 @@ export async function POST(req: Request) {
     }
 
     // 1. Update request status to 'accepted'
-    const { error: updateError } = await supabaseAdmin
-      .from("service_requests")
+    const { error: updateError } = await (supabaseAdmin.from("service_requests") as any)
       .update({ status: 'accepted' })
       .eq("id", requestId);
 
@@ -55,8 +54,7 @@ export async function POST(req: Request) {
     }
 
     // 2. Create an appointment
-    const { data: appointment, error: apptError } = await supabaseAdmin
-      .from("appointments")
+    const { data: appointment, error: apptError } = await (supabaseAdmin.from("appointments") as any)
       .insert({
         request_id: requestId,
         patient_id: request.patient_id,
@@ -68,7 +66,7 @@ export async function POST(req: Request) {
 
     if (apptError) {
       // Revert request status if appointment fails
-      await supabaseAdmin.from("service_requests").update({ status: 'pending' }).eq("id", requestId);
+      await (supabaseAdmin.from("service_requests") as any).update({ status: 'pending' }).eq("id", requestId);
       throw new Error("فشل إنشاء الموعد: " + apptError.message);
     }
 

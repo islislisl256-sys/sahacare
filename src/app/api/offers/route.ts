@@ -19,8 +19,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const { data, error } = await supabaseAdmin
-      .from("offers")
+    const { data, error } = await (supabaseAdmin.from("offers") as any)
       .insert({
         request_id: requestId,
         provider_id: providerId,
@@ -52,18 +51,26 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const requestId = searchParams.get("requestId");
 
-    let query = supabaseAdmin.from("offers").select("*, provider_profile:provider_profiles!provider_id(specialty, is_verified, user:users!user_id(name, avatar_url, phone))");
+    let data, error;
 
     if (requestId) {
       // Patients fetching offers for their specific request
-      // We should theoretically verify that the patient owns the request, but we trust the patient app logic for now or we could check.
-      query = query.eq("request_id", requestId);
+      const res = await supabaseAdmin.from("offers").select("*, provider_profile:provider_profiles!provider_id(specialty, is_verified, user:users!user_id(name, avatar_url, phone))")
+        .eq("request_id", requestId).order('created_at', { ascending: false });
+      data = res.data;
+      error = res.error;
     } else if (role === "provider") {
       // Provider fetching their own offers
-      query = query.eq("provider_id", userId);
+      const res = await supabaseAdmin.from("offers").select("*, provider_profile:provider_profiles!provider_id(specialty, is_verified, user:users!user_id(name, avatar_url, phone))")
+        .eq("provider_id", userId).order('created_at', { ascending: false });
+      data = res.data;
+      error = res.error;
+    } else {
+      const res = await supabaseAdmin.from("offers").select("*, provider_profile:provider_profiles!provider_id(specialty, is_verified, user:users!user_id(name, avatar_url, phone))")
+        .order('created_at', { ascending: false });
+      data = res.data;
+      error = res.error;
     }
-
-    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) throw error;
 

@@ -1,0 +1,22 @@
+const { createClient } = require("@supabase/supabase-js");
+const fs = require('fs');
+let env = '';
+try { env = fs.readFileSync('.env.local', 'utf8'); } catch(e){}
+const urlMatch = env.match(/NEXT_PUBLIC_SUPABASE_URL=(.*)/);
+const keyMatch = env.match(/SUPABASE_SERVICE_ROLE_KEY=(.*)/);
+
+const url = urlMatch ? urlMatch[1].trim() : "";
+const key = keyMatch ? keyMatch[1].trim() : "";
+
+const supabaseAdmin = createClient(url, key);
+
+async function test() {
+  const { data, error } = await supabaseAdmin
+      .from("appointments")
+      .select("*, request:service_requests(*), provider_profile:provider_profiles!provider_id(user:users!user_id(name, phone, avatar_url)), patient:users!patient_id(name, phone, avatar_url)")
+      .limit(1);
+  console.log("Error:", error);
+  if (!error) console.log("Data:", JSON.stringify(data, null, 2));
+}
+
+test();

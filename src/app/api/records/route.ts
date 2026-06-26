@@ -46,8 +46,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const { data, error } = await supabaseAdmin
-      .from("medical_records")
+    const { data, error } = await (supabaseAdmin.from("medical_records") as any)
       .insert({
         appointment_id: appointmentId,
         patient_id: patientId,
@@ -61,12 +60,12 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     // Mark appointment and request as completed
-    await supabaseAdmin.from("appointments").update({ status: 'completed' }).eq("id", appointmentId);
+    await (supabaseAdmin.from("appointments") as any).update({ status: 'completed' }).eq("id", appointmentId);
     
     // Get the request id from the appointment to update it
     const { data: appt } = await supabaseAdmin.from("appointments").select("request_id").eq("id", appointmentId).single();
     if (appt) {
-      await supabaseAdmin.from("service_requests").update({ status: 'completed' }).eq("id", appt.request_id);
+      await (supabaseAdmin.from("service_requests") as any).update({ status: 'completed' }).eq("id", appt.request_id);
     }
 
     return NextResponse.json({ success: true, data });
