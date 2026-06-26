@@ -14,26 +14,28 @@ export async function GET(req: NextRequest) {
     const requestId = searchParams.get("requestId");
     const providerId = searchParams.get("providerId");
 
-    let query = supabaseAdmin
-      .from("appointments")
-      .select("*, request:service_requests(*), provider_profile:provider_profiles!provider_id(user:users!user_id(name, phone, avatar_url)), patient:users!patient_id(name, phone, avatar_url)");
-
     if (requestId) {
-      query = query.eq("request_id", requestId).single();
-      const { data, error } = await query;
+      const { data, error } = await supabaseAdmin
+        .from("appointments")
+        .select("*, request:service_requests(*), provider_profile:provider_profiles!provider_id(user:users!user_id(name, phone, avatar_url)), patient:users!patient_id(name, phone, avatar_url)")
+        .eq("request_id", requestId).single();
+
       if (error) throw error;
       
       const mappedData = data ? {
         ...data,
-        provider: data.provider_profile?.user || null
+        provider: (data as any).provider_profile?.user || null
       } : null;
       
       return NextResponse.json({ data: mappedData });
     }
 
     if (providerId) {
-      query = query.eq("provider_id", providerId).order('created_at', { ascending: false });
-      const { data, error } = await query;
+      const { data, error } = await supabaseAdmin
+        .from("appointments")
+        .select("*, request:service_requests(*), provider_profile:provider_profiles!provider_id(user:users!user_id(name, phone, avatar_url)), patient:users!patient_id(name, phone, avatar_url)")
+        .eq("provider_id", providerId).order('created_at', { ascending: false });
+
       if (error) throw error;
       
       const mappedData = data ? data.map((appt: any) => ({
