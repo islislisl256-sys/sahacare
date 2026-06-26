@@ -8,6 +8,7 @@ export default function ProviderDashboard() {
   const { t } = useLanguage();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [distance, setDistance] = useState(20); // Add distance state
   
   // Offer Modal State
   const [selectedReqId, setSelectedReqId] = useState<string | null>(null);
