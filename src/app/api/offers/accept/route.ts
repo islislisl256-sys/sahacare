@@ -23,9 +23,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Offer not found" }, { status: 404 });
     }
 
-    const requestId = offer.request_id;
-    const providerId = offer.provider_id;
-    const patientId = offer.request?.patient_id;
+    const offerData = offer as any;
+    const requestId = offerData.request_id;
+    const providerId = offerData.provider_id;
+    const patientId = offerData.request?.patient_id;
 
     if (!patientId) {
       return NextResponse.json({ error: "Could not find patient ID" }, { status: 400 });
