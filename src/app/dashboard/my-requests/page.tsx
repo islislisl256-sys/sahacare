@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, CheckCircle2, XCircle, Activity, Brain, Baby, TestTube2, ChevronLeft, Loader2 } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, Activity, Brain, Baby, TestTube2, ChevronLeft, Loader2, Inbox, Calendar, MapPin, DollarSign, FileText } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
@@ -102,8 +102,10 @@ export default function MyRequestsPage() {
 
       {/* Requests List */}
       {filtered.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-gray-100 dark:border-slate-800 text-center">
-          <div className="text-5xl mb-4">📭</div>
+        <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-gray-100 dark:border-slate-800 text-center flex flex-col items-center">
+          <div className="text-gray-400 dark:text-gray-500 mb-4 bg-gray-50 dark:bg-slate-800 p-4 rounded-full">
+            <Inbox className="w-12 h-12" />
+          </div>
           <p className="text-gray-500 dark:text-slate-400 font-medium">{t("no_requests_in_category")}</p>
         </div>
       ) : (
@@ -128,8 +130,8 @@ export default function MyRequestsPage() {
                       <p className="font-bold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                         {SERVICE_LABELS[req.service_type] || req.service_type}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
-                        📅 {dateStr} &nbsp;⏰ {timeStr}
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" /> {dateStr} &nbsp; <Clock className="w-3 h-3" /> {timeStr}
                       </p>
                     </div>
                   </div>
@@ -148,17 +150,17 @@ export default function MyRequestsPage() {
                   <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800 space-y-1.5">
                     {req.address_text && (
                       <p className="text-sm text-gray-600 dark:text-slate-400 flex items-center gap-2">
-                        📍 {req.address_text}
+                        <MapPin className="w-4 h-4 text-gray-400" /> {req.address_text}
                       </p>
                     )}
                     {req.budget && (
                       <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                        💰 الميزانية: {req.budget} دج
+                        <DollarSign className="w-4 h-4" /> الميزانية: {req.budget} دج
                       </p>
                     )}
                     {req.description && (
                       <p className="text-sm text-gray-600 dark:text-slate-400 flex items-start gap-2">
-                        📝 <span className="whitespace-pre-line">{req.description}</span>
+                        <FileText className="w-4 h-4 text-gray-400 mt-0.5" /> <span className="whitespace-pre-line">{req.description}</span>
                       </p>
                     )}
                   </div>

@@ -1,112 +1,240 @@
 'use client';
 
 import { useLanguage } from "@/context/LanguageContext";
-import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { Loader2, User, Phone, MapPin, Calendar, CheckCircle2, AlertCircle, FileText, Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export default function ProviderPatientsPage() {
+export default function ProviderCasesPage() {
   const { t } = useLanguage();
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
+  
+  // Report submission state
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [activeAppt, setActiveAppt] = useState<any>(null);
+  const [reportNotes, setReportNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (session?.user) {
+      fetchCases();
+    }
+  }, [session]);
+
+  const fetchCases = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/appointments?providerId=${(session?.user as any).id}`);
+      if (!res.ok) throw new Error("فشل في جلب الحالات");
+      const data = await res.json();
+      setAppointments(data.data || []);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenReport = (appt: any) => {
+    setActiveAppt(appt);
+    setReportNotes("");
+    setReportModalOpen(true);
+  };
+
+  const handleSubmitReport = async () => {
+    if (!reportNotes.trim()) {
+      alert("الرجاء كتابة تفاصيل التقرير");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/records", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          appointmentId: activeAppt.id,
+          patientId: activeAppt.patient_id,
+          notes: reportNotes
+        })
+      });
+
+      if (!res.ok) throw new Error("فشل في إرسال التقرير");
+      
+      alert("تم إرسال التقرير وإنهاء الحالة بنجاح!");
+      setReportModalOpen(false);
+      fetchCases(); // refresh
+    } catch (err: any) {
+      alert("حدث خطأ: " + err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-10 h-10 text-teal-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="max-w-5xl mx-auto space-y-6 pb-12 pt-6 px-4">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-white transition-colors">{t("manage_patients")}</h2>
-          <p className="text-slate-500 dark:text-slate-400 transition-colors">{t("manage_patients_desc")}</p>
-        </div>
-        <div className="flex gap-3 w-full sm:w-auto">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 flex items-center shadow-sm w-full sm:w-64 transition-colors">
-            <Search className="text-slate-400 dark:text-slate-500 w-4 h-4 ml-2" />
-            <input type="text" placeholder={t("search_patient")} className="outline-none bg-transparent w-full text-sm text-slate-800 dark:text-white" />
-          </div>
-          <button className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-            {t("filter")}
-          </button>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">المرضى الحاليين</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">إدارة مرضاك والتواصل معهم وإنهاء تقاريرهم</p>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-        <div className="overflow-x-auto">
-          <table className="w-full text-right text-sm">
-            <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 transition-colors">
-              <tr>
-                <th className="px-6 py-4 font-bold">{t("patient_name")}</th>
-                <th className="px-6 py-4 font-bold">{t("service_type")}</th>
-                <th className="px-6 py-4 font-bold">{t("location")}</th>
-                <th className="px-6 py-4 font-bold">{t("start_date")}</th>
-                <th className="px-6 py-4 font-bold">{t("status")}</th>
-                <th className="px-6 py-4 font-bold text-center">{t("actions")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {/* Patient 1 - Pending / In Treatment */}
-              <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400 flex items-center justify-center font-bold">
-                      أح
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900 dark:text-white">أحمد بن فلان</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{t("male")} • 65 {t("years")}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">تأهيل حركي (3 جلسات)</td>
-                <td className="px-6 py-4 text-slate-500 dark:text-slate-400">الجزائر، بن عكنون</td>
-                <td className="px-6 py-4 text-slate-500 dark:text-slate-400">12 مايو 2026</td>
-                <td className="px-6 py-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30">
-                    {t("status_under_treatment")}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex justify-center gap-2">
-                    <a href="/provider/treatments/add/1" className="bg-teal-600 border border-teal-600 text-white hover:bg-teal-700 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors text-center">{t("add_report")}</a>
-                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("call")}</button>
-                  </div>
-                </td>
-              </tr>
-              
-              {/* Patient 2 - Completed */}
-              <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 flex items-center justify-center font-bold">
-                      فا
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900 dark:text-white">فاطمة الزهراء</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{t("female")} • 42 {t("years")}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">تحاليل دم بالمنزل</td>
-                <td className="px-6 py-4 text-slate-500 dark:text-slate-400">الجزائر، دالي ابراهيم</td>
-                <td className="px-6 py-4 text-slate-500 dark:text-slate-400">10 مايو 2026</td>
-                <td className="px-6 py-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
-                    {t("status_completed_provider")}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex justify-center gap-2">
-                    <a href="/provider/treatments/2" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("view_report")}</a>
-                    <button className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">{t("call")}</button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      {errorMsg && (
+        <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-2">
+          <AlertCircle className="w-5 h-5" />
+          {errorMsg}
         </div>
-        
-        <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between transition-colors">
-          <p className="text-sm text-slate-500 dark:text-slate-400">{t("showing_patients").replace("{count}", "2").replace("{total}", "2")}</p>
-          <div className="flex gap-1">
-            <button className="px-3 py-1 border border-slate-200 dark:border-slate-700 rounded text-slate-400 dark:text-slate-500 cursor-not-allowed bg-white dark:bg-slate-900 text-sm transition-colors">{t("previous")}</button>
-            <button className="px-3 py-1 border border-slate-200 dark:border-slate-700 rounded text-slate-400 dark:text-slate-500 cursor-not-allowed bg-white dark:bg-slate-900 text-sm transition-colors">{t("next")}</button>
+      )}
+
+      {appointments.length === 0 ? (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800 shadow-sm">
+          <User className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">لا توجد حالات حالية</h3>
+          <p className="text-slate-500 dark:text-slate-400">عندما يوافق مريض على أحد عروضك، سيظهر هنا.</p>
+        </div>
+      ) : (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
+          <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              <User className="w-5 h-5 text-teal-600" />
+              قائمة المرضى الحاليين
+            </h3>
+          </div>
+          <div className="p-6 grid grid-cols-1 gap-4">
+          {appointments.map((appt) => (
+            <div key={appt.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-teal-400 dark:hover:border-teal-500/50 hover:shadow-md transition-all group flex flex-col">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+                    {appt.patient?.avatar_url ? (
+                      <img src={appt.patient.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-6 h-6 text-slate-400" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-slate-900 dark:text-white">{appt.patient?.name || "مريض غير معروف"}</h3>
+                    <p className="text-sm text-slate-500 flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" /> 
+                      {new Date(appt.created_at).toLocaleDateString('ar-EG')}
+                    </p>
+                  </div>
+                </div>
+                <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+                  appt.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                }`}>
+                  {appt.status === 'completed' ? 'منتهية' : 'قيد التنفيذ'}
+                </span>
+              </div>
+
+              <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl mb-4 border border-slate-100 dark:border-slate-700">
+                <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">تفاصيل الخدمة: {appt.request?.service_type}</h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line mb-3">
+                  {appt.request?.description}
+                </p>
+                {appt.request?.address_text && (
+                  <p className="text-sm text-slate-500 flex items-start gap-1">
+                    <MapPin className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    {appt.request.address_text}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-2 mt-auto border-t border-slate-100 dark:border-slate-800">
+                <a 
+                  href={`tel:${appt.patient?.phone}`}
+                  className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 py-2.5 rounded-xl font-bold transition-colors shadow-sm"
+                >
+                  <Phone className="w-4 h-4" /> اتصال
+                </a>
+                
+                {appt.status !== 'completed' ? (
+                  <button
+                    onClick={() => handleOpenReport(appt)}
+                    className="flex-1 flex items-center justify-center gap-2 bg-teal-600 dark:bg-teal-500 hover:bg-teal-700 dark:hover:bg-teal-600 text-white py-2.5 rounded-xl font-bold transition-colors shadow-sm"
+                  >
+                    <FileText className="w-4 h-4" /> إنهاء التقرير
+                  </button>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center gap-2 bg-green-50 text-green-600 py-2.5 rounded-xl font-bold border border-green-100">
+                    <CheckCircle2 className="w-4 h-4" /> التقرير مُرسل
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Report Modal */}
+      {reportModalOpen && activeAppt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 w-full max-w-xl shadow-2xl">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+              <FileText className="w-6 h-6 text-teal-500" />
+              كتابة التقرير الطبي
+            </h2>
+            
+            <p className="text-sm text-slate-500 mb-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+              للمريض: <strong className="text-slate-800 dark:text-white">{activeAppt.patient?.name}</strong>
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">تفاصيل التشخيص والعلاج</label>
+                <textarea
+                  value={reportNotes}
+                  onChange={(e) => setReportNotes(e.target.value)}
+                  className="w-full h-32 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 outline-none focus:border-teal-500 text-slate-900 dark:text-white resize-none"
+                  placeholder="قم بكتابة التشخيص، الأدوية الموصوفة، أو أي ملاحظات هامة للمريض..."
+                />
+              </div>
+
+              {/* Upload simulated button */}
+              <div className="flex items-center gap-3">
+                <button type="button" className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                  <Upload className="w-4 h-4" /> إرفاق ملف (قريباً)
+                </button>
+                <span className="text-xs text-slate-400">سيتم تفعيل رفع الملفات لاحقاً</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-8">
+              <button 
+                onClick={() => setReportModalOpen(false)}
+                className="px-6 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              >
+                إلغاء
+              </button>
+              <button 
+                onClick={handleSubmitReport}
+                disabled={submitting}
+                className="px-6 py-2.5 bg-teal-600 text-white font-bold rounded-xl shadow-lg shadow-teal-200 dark:shadow-none hover:bg-teal-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                إرسال وإغلاق الحالة
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

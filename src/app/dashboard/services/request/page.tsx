@@ -125,10 +125,8 @@ function RequestServiceContent() {
     setErrorMsg("");
     
     try {
-      let prescriptionUrl = null;
-      if (images.length > 0) {
-        prescriptionUrl = await uploadFile(images[0]); // Just uploading first image for simplicity
-      }
+      // Image upload disabled as requested
+      const prescriptionUrl = null;
       
       const payload = {
         serviceType,

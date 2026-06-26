@@ -1,4 +1,5 @@
 'use client';
+import { FileText, XCircle } from "lucide-react";
 
 export default function AdminApplicationsPage() {
   return (
@@ -24,10 +25,10 @@ export default function AdminApplicationsPage() {
             <p className="text-zinc-500 text-sm mb-3">طبيب عام • الجزائر العاصمة • سجل منذ 24 ساعة</p>
             <div className="flex gap-4">
               <a href="#" className="flex items-center gap-2 text-sm text-blue-600 hover:underline font-bold">
-                📄 عرض الشهادة الجامعية (PDF)
+                <FileText className="w-4 h-4" /> عرض الشهادة الجامعية (PDF)
               </a>
               <a href="#" className="flex items-center gap-2 text-sm text-blue-600 hover:underline font-bold">
-                📄 رخصة مزاولة المهنة (JPG)
+                <FileText className="w-4 h-4" /> رخصة مزاولة المهنة (JPG)
               </a>
             </div>
           </div>
@@ -54,10 +55,10 @@ export default function AdminApplicationsPage() {
             <p className="text-zinc-500 text-sm mb-3">ممرضة رعاية منزلية • وهران • سجلت منذ 3 أيام</p>
             <div className="flex gap-4">
               <a href="#" className="flex items-center gap-2 text-sm text-blue-600 hover:underline font-bold">
-                📄 شهادة التمريض (PDF)
+                <FileText className="w-4 h-4" /> عرض الشهادة الجامعية (PDF)
               </a>
               <span className="flex items-center gap-2 text-sm text-red-500 font-bold">
-                ❌ رخصة المزاولة غير متوفرة
+                <XCircle className="w-4 h-4" /> رخصة المزاولة غير متوفرة
               </span>
             </div>
           </div>

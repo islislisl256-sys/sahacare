@@ -17,11 +17,11 @@ export default function RequestDetailsAndOffersPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      fetchData();
-    }
-  }, [id]);
+  // Negotiation Modal State
+  const [negotiateOfferId, setNegotiateOfferId] = useState<string | null>(null);
+  const [counterPrice, setCounterPrice] = useState("");
+  const [counterMessage, setCounterMessage] = useState("");
+  const [submittingCounter, setSubmittingCounter] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -46,6 +46,12 @@ export default function RequestDetailsAndOffersPage() {
     }
   };
 
+  useEffect(() => {
+    if (id) {
+      fetchData();
+    }
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleAcceptOffer = async (offerId: string) => {
     setAcceptingId(offerId);
     try {
@@ -61,11 +67,38 @@ export default function RequestDetailsAndOffersPage() {
       }
 
       // If success, navigate to the treatment page where they can call the provider
-      router.push(`/dashboard/treatments/${id}`);
+      window.location.href = `/dashboard/treatments/${id}`;
     } catch (err: any) {
       console.error(err);
       alert("حدث خطأ: " + err.message);
       setAcceptingId(null);
+    }
+  };
+
+  const handleCounterOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!negotiateOfferId || !counterPrice) return;
+    setSubmittingCounter(true);
+    try {
+      const res = await fetch("/api/offers/counter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          offerId: negotiateOfferId,
+          price: parseFloat(counterPrice),
+          message: counterMessage,
+        })
+      });
+      if (!res.ok) throw new Error("Failed to submit counter offer");
+      
+      setNegotiateOfferId(null);
+      setCounterPrice("");
+      setCounterMessage("");
+      fetchData(); // Refresh the list
+    } catch (err: any) {
+      alert("حدث خطأ: " + err.message);
+    } finally {
+      setSubmittingCounter(false);
     }
   };
 
@@ -170,19 +203,32 @@ export default function RequestDetailsAndOffersPage() {
                     {offer.price} د.ج
                   </div>
                   
-                  {reqDetails.status === 'pending' && (
-                    <button
-                      onClick={() => handleAcceptOffer(offer.id)}
-                      disabled={acceptingId !== null}
-                      className="w-full md:w-auto px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                    >
-                      {acceptingId === offer.id ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <CheckCircle2 className="w-5 h-5" />
-                      )}
-                      قبول العرض
-                    </button>
+                  {reqDetails.status === 'pending' && offer.status !== 'countered_by_patient' && (
+                    <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                      <button
+                        onClick={() => handleAcceptOffer(offer.id)}
+                        disabled={acceptingId !== null}
+                        className="w-full md:w-auto px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {acceptingId === offer.id ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="w-5 h-5" />
+                        )}
+                        قبول العرض
+                      </button>
+                      <button
+                        onClick={() => setNegotiateOfferId(offer.id)}
+                        className="w-full md:w-auto px-6 py-2.5 bg-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-200 dark:shadow-none hover:bg-amber-600 transition-colors flex items-center justify-center"
+                      >
+                        تفاوض
+                      </button>
+                    </div>
+                  )}
+                  {offer.status === 'countered_by_patient' && (
+                    <div className="text-sm font-bold text-amber-600 bg-amber-50 dark:bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-500/20 w-full text-center">
+                      في انتظار رد المعالج...
+                    </div>
                   )}
                 </div>
               </div>
@@ -190,6 +236,56 @@ export default function RequestDetailsAndOffersPage() {
           </div>
         )}
       </div>
+
+      {/* Negotiation Modal */}
+      {negotiateOfferId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md p-6 shadow-xl border border-slate-200 dark:border-slate-800">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">اقتراح سعر جديد</h3>
+            <form onSubmit={handleCounterOffer} className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">السعر المقترح (دج)</label>
+                <input 
+                  type="number" 
+                  required
+                  value={counterPrice}
+                  onChange={(e) => setCounterPrice(e.target.value)}
+                  placeholder="أدخل السعر الجديد" 
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-red-500 dark:text-white transition-colors" 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">رسالة (اختياري)</label>
+                <textarea 
+                  value={counterMessage}
+                  onChange={(e) => setCounterMessage(e.target.value)}
+                  rows={3}
+                  placeholder="أضف رسالة للمعالج..." 
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-red-500 dark:text-white resize-none transition-colors"
+                ></textarea>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button 
+                  type="button"
+                  onClick={() => setNegotiateOfferId(null)}
+                  className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={submittingCounter}
+                  className="flex-1 py-3 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                >
+                  {submittingCounter ? <Loader2 className="w-5 h-5 animate-spin" /> : "إرسال الاقتراح"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

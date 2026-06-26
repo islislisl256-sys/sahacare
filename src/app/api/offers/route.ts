@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const requestId = searchParams.get("requestId");
 
-    let query = supabaseAdmin.from("offers").select("*, provider:users(name, avatar_url, phone), profile:provider_profiles(specialty, is_verified)");
+    let query = supabaseAdmin.from("offers").select("*, provider_profile:provider_profiles!provider_id(specialty, is_verified, user:users!user_id(name, avatar_url, phone))");
 
     if (requestId) {
       // Patients fetching offers for their specific request
@@ -67,7 +67,16 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json({ data });
+    const mappedData = data ? data.map((offer: any) => ({
+      ...offer,
+      provider: offer.provider_profile?.user || null,
+      profile: {
+        specialty: offer.provider_profile?.specialty,
+        is_verified: offer.provider_profile?.is_verified,
+      }
+    })) : [];
+
+    return NextResponse.json({ data: mappedData });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

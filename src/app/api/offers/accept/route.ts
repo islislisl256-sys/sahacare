@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     // 1. Fetch the offer to get request_id and provider_id
     const { data: offer, error: offerError } = await supabaseAdmin
       .from("offers")
-      .select("*")
+      .select("*, request:service_requests(patient_id)")
       .eq("id", offerId)
       .single();
 
@@ -25,7 +25,11 @@ export async function POST(req: NextRequest) {
 
     const requestId = offer.request_id;
     const providerId = offer.provider_id;
-    const patientId = (session.user as any).id;
+    const patientId = offer.request?.patient_id;
+
+    if (!patientId) {
+      return NextResponse.json({ error: "Could not find patient ID" }, { status: 400 });
+    }
 
     // 2. Update offer status to 'accepted'
     await supabaseAdmin

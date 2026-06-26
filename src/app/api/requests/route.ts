@@ -23,6 +23,21 @@ export async function POST(req: NextRequest) {
       prescriptionUrl 
     } = body;
 
+    // Ensure user exists in public.users to prevent foreign key constraint errors
+    // if they signed up before the database triggers were created.
+    const { error: userError } = await supabaseAdmin
+      .from("users")
+      .upsert({
+        id: patientId,
+        email: session.user.email,
+        name: session.user.name || "مستخدم",
+        role: "patient"
+      }, { onConflict: "id" });
+      
+    if (userError) {
+      console.warn("Could not upsert user, proceeding anyway:", userError);
+    }
+
     const { data, error } = await supabaseAdmin
       .from("service_requests")
       .insert({
@@ -39,11 +54,16 @@ export async function POST(req: NextRequest) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase insert error:", error);
+      // Return the specific error message to the client for debugging
+      return NextResponse.json({ error: "DB Error: " + error.message }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Request API error:", error);
+    return NextResponse.json({ error: error.message || "حدث خطأ غير معروف" }, { status: 500 });
   }
 }
 
@@ -55,7 +75,13 @@ export async function GET(req: NextRequest) {
     }
 
     const userId = (session.user as any).id;
-    const role = (session.user as any).role;
+    
+    // Fetch fresh role from DB to avoid NextAuth token caching issues during dev
+    let role = (session.user as any).role;
+    const { data: userData } = await supabaseAdmin.from("users").select("role").eq("id", userId).single();
+    if (userData && userData.role) {
+      role = userData.role;
+    }
     
     const { searchParams } = new URL(req.url);
     const filter = searchParams.get("filter");

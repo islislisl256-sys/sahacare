@@ -12,8 +12,8 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between transition-colors">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-            {t("welcome_back")}، {session?.user?.name || session?.user?.email?.split('@')[0] || t("welcome")}! 👋
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+            {t("welcome_back")}، {session?.user?.name || session?.user?.email?.split('@')[0] || t("welcome")}!
           </h2>
           <p className="text-gray-600 dark:text-slate-400">
             {t("patient_dashboard_desc")}

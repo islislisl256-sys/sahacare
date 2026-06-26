@@ -1,5 +1,7 @@
 'use client';
 
+import { Search } from "lucide-react";
+
 export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
@@ -10,7 +12,7 @@ export default function AdminUsersPage() {
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <div className="bg-white border border-zinc-200 rounded-xl px-4 py-2 flex items-center shadow-sm w-full sm:w-64">
-            <span className="text-zinc-400 ml-2">🔍</span>
+            <Search className="w-4 h-4 text-zinc-400 ml-2" />
             <input type="text" placeholder="ابحث بالإيميل أو الاسم..." className="outline-none bg-transparent w-full text-sm" />
           </div>
         </div>

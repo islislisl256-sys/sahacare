@@ -18,9 +18,9 @@ function AdminContent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (status === "authenticated" && (session?.user as any)?.role !== "admin") {
-      router.push("/");
+      window.location.href = "/";
     }
-  }, [session, status, router]);
+  }, [session, status]);
 
   if (status === "loading" || (status === "authenticated" && (session?.user as any)?.role !== "admin")) {
     return <div className="flex h-screen items-center justify-center bg-white dark:bg-zinc-950 text-amber-500 font-bold">جاري التحقق من صلاحيات الإدارة العليا...</div>;

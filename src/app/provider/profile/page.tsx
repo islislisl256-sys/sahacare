@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useLanguage } from "@/context/LanguageContext";
-import { FileText, CheckCircle2, Loader2, Key } from "lucide-react";
+import { FileText, CheckCircle2, Loader2, Key, Edit2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function ProviderProfilePage() {
@@ -11,6 +11,7 @@ export default function ProviderProfilePage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState<{type: 'success'|'error', text: string} | null>(null);
 
   // Form State
@@ -20,12 +21,6 @@ export default function ProviderProfilePage() {
   const [workArea, setWorkArea] = useState("");
   const [travelCost, setTravelCost] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
-  useEffect(() => {
-    if (session?.user) {
-      fetchProfile();
-    }
-  }, [session]);
 
   const fetchProfile = async () => {
     try {
@@ -49,6 +44,12 @@ export default function ProviderProfilePage() {
     }
   };
 
+  useEffect(() => {
+    if (session?.user) {
+      fetchProfile();
+    }
+  }, [session]);
+
   const handleSave = async () => {
     setSaving(true);
     setMessage(null);
@@ -69,6 +70,7 @@ export default function ProviderProfilePage() {
       if (res.ok) {
         setMessage({ type: 'success', text: "تم حفظ التعديلات بنجاح" });
         setNewPassword(""); // Clear password field after success
+        setIsEditing(false); // Hide edit mode after save
       } else {
         const data = await res.json();
         setMessage({ type: 'error', text: data.error || "حدث خطأ أثناء الحفظ" });
@@ -91,14 +93,26 @@ export default function ProviderProfilePage() {
           <h2 className="text-2xl font-bold text-slate-800 dark:text-white transition-colors">{t("professional_profile")}</h2>
           <p className="text-slate-500 dark:text-slate-400 transition-colors">{t("update_data_desc")}</p>
         </div>
-        <button 
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-teal-600 dark:bg-teal-500 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
-        >
-          {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-          {t("save_changes")}
-        </button>
+        <div>
+          {!isEditing ? (
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="bg-teal-600 dark:bg-teal-500 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors shadow-sm flex items-center gap-2"
+            >
+              <Edit2 className="w-4 h-4" />
+              تعديل البيانات
+            </button>
+          ) : (
+            <button 
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-teal-600 dark:bg-teal-500 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+            >
+              {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+              {t("save_changes") || "حفظ التعديلات"}
+            </button>
+          )}
+        </div>
       </div>
 
       {message && (
@@ -125,40 +139,62 @@ export default function ProviderProfilePage() {
               <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 border-b border-slate-100 dark:border-slate-800 pb-2">{t("basic_data")}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("full_name_label")}</label>
-                  <input 
-                    type="text" 
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="د. أحمد عبد الله" 
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" 
-                  />
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("full_name_label") || "الاسم الكامل"}</label>
+                  {!isEditing ? (
+                    <div className="w-full bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-slate-800 dark:text-white font-medium">
+                      {name || "غير محدد"}
+                    </div>
+                  ) : (
+                    <input 
+                      type="text" 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="د. أحمد عبد الله" 
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" 
+                    />
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("specialty")}</label>
-                  <select 
-                    value={specialty}
-                    onChange={(e) => setSpecialty(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors text-slate-700"
-                  >
-                    <option value="">{t("specialty")}</option>
-                    <option value="physical_therapy">{t("specialty_physical")}</option>
-                    <option value="lab">{t("specialty_lab")}</option>
-                    <option value="nurse">{t("specialty_nurse")}</option>
-                    <option value="doctor">{t("specialty_doctor")}</option>
-                  </select>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("specialty") || "التخصص"}</label>
+                  {!isEditing ? (
+                    <div className="w-full bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-slate-800 dark:text-white font-medium">
+                      {specialty === 'physical_therapy' ? t("specialty_physical") :
+                       specialty === 'lab' ? t("specialty_lab") :
+                       specialty === 'nurse' ? t("specialty_nurse") :
+                       specialty === 'doctor' ? t("specialty_doctor") : 
+                       specialty || "غير محدد"}
+                    </div>
+                  ) : (
+                    <select 
+                      value={specialty}
+                      onChange={(e) => setSpecialty(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors text-slate-700"
+                    >
+                      <option value="">{t("specialty")}</option>
+                      <option value="physical_therapy">{t("specialty_physical")}</option>
+                      <option value="lab">{t("specialty_lab")}</option>
+                      <option value="nurse">{t("specialty_nurse")}</option>
+                      <option value="doctor">{t("specialty_doctor")}</option>
+                    </select>
+                  )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("bio")}</label>
-                <textarea 
-                  rows={3} 
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder={t("bio_placeholder")} 
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white resize-none transition-colors"
-                ></textarea>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("bio") || "نبذة"}</label>
+                {!isEditing ? (
+                  <div className="w-full bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-slate-800 dark:text-white font-medium min-h-[5rem] whitespace-pre-wrap">
+                    {bio || "لا توجد نبذة حالياً"}
+                  </div>
+                ) : (
+                  <textarea 
+                    rows={3} 
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder={t("bio_placeholder") || "نبذة"} 
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white resize-none transition-colors"
+                  ></textarea>
+                )}
               </div>
             </div>
           </div>
@@ -168,49 +204,63 @@ export default function ProviderProfilePage() {
             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6">{t("service_pricing")}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("work_area")}</label>
-                <input 
-                  type="text" 
-                  value={workArea}
-                  onChange={(e) => setWorkArea(e.target.value)}
-                  placeholder={t("work_area_placeholder")} 
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" 
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("default_travel_cost")}</label>
-                <div className="relative">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("work_area") || "نطاق العمل"}</label>
+                {!isEditing ? (
+                  <div className="w-full bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-slate-800 dark:text-white font-medium">
+                    {workArea || "غير محدد"}
+                  </div>
+                ) : (
                   <input 
-                    type="number" 
-                    value={travelCost}
-                    onChange={(e) => setTravelCost(e.target.value)}
-                    placeholder="1000" 
+                    type="text" 
+                    value={workArea}
+                    onChange={(e) => setWorkArea(e.target.value)}
+                    placeholder={t("work_area_placeholder") || "الجزائر العاصمة وضواحيها"} 
                     className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" 
                   />
-                  <span className="absolute left-4 top-3 text-slate-400 dark:text-slate-500 text-sm font-bold">{t("currency")}</span>
-                </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">{t("default_travel_cost") || "تكلفة التنقل الافتراضية"}</label>
+                {!isEditing ? (
+                  <div className="w-full bg-slate-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-slate-800 dark:text-white font-medium">
+                    {travelCost ? `${travelCost} ${t("currency") || "دج"}` : "غير محدد"}
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <input 
+                      type="number" 
+                      value={travelCost}
+                      onChange={(e) => setTravelCost(e.target.value)}
+                      placeholder="1000" 
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" 
+                    />
+                    <span className="absolute left-4 top-3 text-slate-400 dark:text-slate-500 text-sm font-bold">{t("currency") || "دج"}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* Security (Password Change) */}
-          <div className="pt-8 border-b border-slate-100 dark:border-slate-800 pb-8 transition-colors">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-              <Key className="w-5 h-5" /> تغيير كلمة المرور
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">كلمة المرور الجديدة</label>
-                <input 
-                  type="password" 
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="اتركها فارغة إذا لم ترد التغيير" 
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" 
-                />
+          {isEditing && (
+            <div className="pt-8 border-b border-slate-100 dark:border-slate-800 pb-8 transition-colors">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                <Key className="w-5 h-5" /> تغيير كلمة المرور
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">كلمة المرور الجديدة</label>
+                  <input 
+                    type="password" 
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="اتركها فارغة إذا لم ترد التغيير" 
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-teal-500 dark:focus:border-teal-400 dark:text-white transition-colors" 
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Verification Documents */}
           <div className="pt-8">

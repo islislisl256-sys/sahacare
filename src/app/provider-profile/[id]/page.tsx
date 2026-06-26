@@ -18,12 +18,6 @@ export default function ProviderProfilePage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [distance, setDistance] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (id) {
-      fetchData();
-    }
-  }, [id]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -56,6 +50,12 @@ export default function ProviderProfilePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (id) {
+      fetchData();
+    }
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (

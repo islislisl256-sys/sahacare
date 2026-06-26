@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from "@/context/LanguageContext";
+import { Calendar } from "lucide-react";
 
 export default function Appointments() {
   const { t } = useLanguage();
@@ -15,8 +16,10 @@ export default function Appointments() {
       </div>
 
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
-        <div className="p-6 text-center text-gray-500 py-12">
-          <div className="text-6xl mb-4">📅</div>
+        <div className="p-6 text-center text-gray-500 py-12 flex flex-col items-center">
+          <div className="text-gray-400 dark:text-gray-500 mb-4 bg-gray-50 dark:bg-slate-800 p-4 rounded-full">
+            <Calendar className="w-12 h-12" />
+          </div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">{t("no_appointments")}</h3>
           <p className="dark:text-slate-400">{t("no_appointments_desc")}</p>
         </div>

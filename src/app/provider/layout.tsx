@@ -20,9 +20,9 @@ function ProviderContent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (status === "authenticated" && (session?.user as any)?.role !== "provider") {
-      router.push("/");
+      window.location.href = "/";
     }
-  }, [session, status, router]);
+  }, [session, status]);
 
   if (status === "loading" || (status === "authenticated" && (session?.user as any)?.role !== "provider")) {
     return <div className="flex h-screen items-center justify-center bg-white dark:bg-slate-950 text-teal-600 font-bold">{t("verifying_access")}</div>;

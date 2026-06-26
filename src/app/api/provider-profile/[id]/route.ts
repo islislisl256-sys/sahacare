@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const { data: user, error: userError } = await supabaseAdmin
       .from("users")
       .select("id, name, email, phone, avatar_url, role")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (userError || !user) {
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("provider_profiles")
       .select("*")
-      .eq("user_id", params.id)
+      .eq("user_id", id)
       .single();
 
     // It's okay if profile doesn't exist for some reason, we just return the user basic info

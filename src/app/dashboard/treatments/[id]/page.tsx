@@ -28,10 +28,6 @@ export default function TreatmentDetailsPage() {
   const [feedback, setFeedback] = useState("");
   const [submittedFeedback, setSubmittedFeedback] = useState(false);
 
-  useEffect(() => {
-    if (id) fetchData();
-  }, [id]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -59,6 +55,10 @@ export default function TreatmentDetailsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (id) fetchData();
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (

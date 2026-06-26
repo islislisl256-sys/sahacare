@@ -10,6 +10,8 @@ export default function ProviderDashboard() {
   const router = useRouter();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeOffers, setActiveOffers] = useState<any[]>([]);
+  const [loadingOffers, setLoadingOffers] = useState(true);
   const [distance, setDistance] = useState(20); // Add distance state
   
   // Offer Modal State
@@ -19,6 +21,15 @@ export default function ProviderDashboard() {
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const [offerError, setOfferError] = useState("");
   const [offerSuccess, setOfferSuccess] = useState(false);
+  
+  // Accept Request State
+  const [acceptingReqId, setAcceptingReqId] = useState<string | null>(null);
+
+  // Counter Offer Modal State
+  const [counterOfferId, setCounterOfferId] = useState<string | null>(null);
+  const [counterPrice, setCounterPrice] = useState("");
+  const [counterMessage, setCounterMessage] = useState("");
+  const [submittingCounter, setSubmittingCounter] = useState(false);
 
   // Translations for service types
   const SERVICE_LABELS: Record<string, string> = {
@@ -30,7 +41,23 @@ export default function ProviderDashboard() {
 
   useEffect(() => {
     fetchRequests();
+    fetchOffers();
   }, []);
+
+  const fetchOffers = async () => {
+    try {
+      const res = await fetch("/api/offers");
+      const json = await res.json();
+      if (json.data) {
+        // Filter out accepted/rejected to only show active negotiations
+        setActiveOffers(json.data.filter((o: any) => o.status !== 'rejected' && o.status !== 'accepted'));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingOffers(false);
+    }
+  };
 
   const fetchRequests = async () => {
     try {
@@ -76,12 +103,75 @@ export default function ProviderDashboard() {
         setOfferPrice("");
         setOfferMessage("");
         fetchRequests(); // Refresh the list
+        fetchOffers();
       }, 2000);
       
     } catch (err: any) {
       setOfferError(err.message || "حدث خطأ");
     } finally {
       setSubmittingOffer(false);
+    }
+  };
+
+  const handleAcceptRequest = async (requestId: string) => {
+    setAcceptingReqId(requestId);
+    try {
+      const res = await fetch("/api/requests/accept", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "فشل في قبول الطلب");
+      }
+      fetchRequests();
+    } catch (err: any) {
+      alert(err.message || "حدث خطأ");
+    } finally {
+      setAcceptingReqId(null);
+    }
+  };
+
+  const handleAcceptOffer = async (offerId: string) => {
+    try {
+      const res = await fetch("/api/offers/accept", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ offerId }),
+      });
+      if (!res.ok) throw new Error("فشل في قبول العرض");
+      fetchOffers();
+      window.location.href = '/provider/patients';
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleCounterOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!counterOfferId || !counterPrice) return;
+    setSubmittingCounter(true);
+    try {
+      const res = await fetch("/api/offers/counter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          offerId: counterOfferId,
+          price: parseFloat(counterPrice),
+          message: counterMessage,
+        })
+      });
+      if (!res.ok) throw new Error("فشل إرسال الاقتراح");
+      
+      setCounterOfferId(null);
+      setCounterPrice("");
+      setCounterMessage("");
+      fetchOffers();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSubmittingCounter(false);
     }
   };
 
@@ -101,7 +191,7 @@ export default function ProviderDashboard() {
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors">
           <div>
             <p className="text-slate-500 dark:text-slate-400 text-sm font-bold">{t("pending_offers")}</p>
-            <p className="text-3xl font-extrabold text-slate-800 dark:text-white mt-2">0</p>
+            <p className="text-3xl font-extrabold text-slate-800 dark:text-white mt-2">{activeOffers.length}</p>
           </div>
           <div className="bg-amber-50 dark:bg-amber-500/10 w-14 h-14 rounded-xl flex items-center justify-center text-amber-600 dark:text-amber-400">
             <Hourglass className="w-6 h-6" />
@@ -127,10 +217,10 @@ export default function ProviderDashboard() {
           </h3>
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => router.push('/provider/cases')}
+              onClick={() => router.push('/provider/patients')}
               className="bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 font-bold px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-500/30 hover:bg-indigo-100 transition-colors text-sm"
             >
-              حالاتي المقبولة
+              المرضى الحاليين
             </button>
             <select
               value={distance}
@@ -177,7 +267,15 @@ export default function ProviderDashboard() {
                   {req.description || "لا يوجد تفاصيل إضافية."}
                 </p>
                 <div className="flex gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <button onClick={() => setSelectedReqId(req.id)} className="bg-teal-600 dark:bg-teal-500 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors shadow-sm">
+                  <button 
+                    onClick={() => handleAcceptRequest(req.id)} 
+                    disabled={acceptingReqId === req.id}
+                    className="bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {acceptingReqId === req.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                    قبول الطلب مباشرة
+                  </button>
+                  <button onClick={() => setSelectedReqId(req.id)} className="bg-teal-600 dark:bg-teal-500 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-teal-700 dark:hover:bg-teal-600 transition-colors shadow-sm">
                     {t("submit_offer")}
                   </button>
                   {req.prescription_url && (
@@ -186,6 +284,74 @@ export default function ProviderDashboard() {
                     </a>
                   )}
                 </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Active Offers & Negotiations */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors mt-8">
+        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+            <Hourglass className="w-5 h-5 text-amber-600" />
+            عروضي النشطة والمفاوضات
+          </h3>
+        </div>
+        
+        <div className="p-6 grid grid-cols-1 gap-4">
+          {loadingOffers ? (
+            <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-amber-600" /></div>
+          ) : activeOffers.length === 0 ? (
+            <div className="text-center p-8 text-slate-500 dark:text-slate-400 font-bold text-lg">
+              لا توجد عروض نشطة أو مفاوضات حالياً
+            </div>
+          ) : (
+            activeOffers.map((offer) => (
+              <div key={offer.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-amber-400 dark:hover:border-amber-500/50 hover:shadow-md transition-all group">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <span className={`inline-block px-3 py-1 rounded-md text-xs font-bold mb-3 border ${
+                      offer.status === 'countered_by_patient' 
+                        ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                        : 'bg-slate-50 text-slate-700 border-slate-200'
+                    }`}>
+                      {offer.status === 'countered_by_patient' ? 'اقتراح سعر جديد من المريض' : 'بانتظار رد المريض'}
+                    </span>
+                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">
+                      السعر الحالي: {offer.price} دج
+                    </h4>
+                    {offer.message && (
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 bg-slate-50 p-3 rounded-lg border border-slate-100 italic">
+                        "{offer.message}"
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-1">وقت التقديم</p>
+                    <p className="text-sm font-bold text-slate-800 dark:text-white">
+                      {new Date(offer.created_at).toLocaleDateString('ar-DZ')}
+                    </p>
+                  </div>
+                </div>
+                
+                {offer.status === 'countered_by_patient' && (
+                  <div className="flex gap-3 pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button 
+                      onClick={() => handleAcceptOffer(offer.id)}
+                      className="bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm flex items-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      قبول السعر
+                    </button>
+                    <button 
+                      onClick={() => setCounterOfferId(offer.id)}
+                      className="bg-amber-500 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-amber-600 transition-colors shadow-sm"
+                    >
+                      اقتراح سعر آخر
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -246,6 +412,51 @@ export default function ProviderDashboard() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+      {/* Counter Offer Modal */}
+      {counterOfferId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md p-6 shadow-xl border border-slate-200 dark:border-slate-800">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">تقديم سعر آخر</h3>
+              <button onClick={() => setCounterOfferId(null)} className="text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleCounterOffer} className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">السعر المقترح (دج)</label>
+                <input 
+                  type="number" 
+                  required
+                  value={counterPrice}
+                  onChange={(e) => setCounterPrice(e.target.value)}
+                  placeholder="أدخل السعر الجديد" 
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-amber-500 dark:text-white transition-colors" 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">رسالة (اختياري)</label>
+                <textarea 
+                  value={counterMessage}
+                  onChange={(e) => setCounterMessage(e.target.value)}
+                  rows={3}
+                  placeholder="أضف رسالة..." 
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-amber-500 dark:text-white resize-none transition-colors"
+                ></textarea>
+              </div>
+              
+              <button 
+                type="submit" 
+                disabled={submittingCounter}
+                className="w-full py-3.5 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+              >
+                {submittingCounter ? <Loader2 className="w-5 h-5 animate-spin" /> : "إرسال الاقتراح"}
+              </button>
+            </form>
           </div>
         </div>
       )}
