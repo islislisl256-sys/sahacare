@@ -28,13 +28,13 @@ export default function RequestDetailsAndOffersPage() {
     setErrorMsg("");
     try {
       // 1. Fetch Request
-      const reqRes = await fetch(`/api/requests/${id}`);
+      const reqRes = await fetch(`/api/requests/${id}`, { cache: 'no-store' });
       if (!reqRes.ok) throw new Error("Failed to fetch request details");
       const reqData = await reqRes.json();
       setReqDetails(reqData.data);
 
       // 2. Fetch Offers for this request
-      const offersRes = await fetch(`/api/offers?requestId=${id}`);
+      const offersRes = await fetch(`/api/offers?requestId=${id}`, { cache: 'no-store' });
       if (!offersRes.ok) throw new Error("Failed to fetch offers");
       const offersData = await offersRes.json();
       setOffers(offersData.data || []);

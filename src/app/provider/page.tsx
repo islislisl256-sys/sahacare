@@ -46,7 +46,7 @@ export default function ProviderDashboard() {
 
   const fetchOffers = async () => {
     try {
-      const res = await fetch("/api/offers");
+      const res = await fetch("/api/offers", { cache: 'no-store' });
       const json = await res.json();
       if (json.data) {
         // Filter out accepted/rejected to only show active negotiations
@@ -61,7 +61,7 @@ export default function ProviderDashboard() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch("/api/requests");
+      const res = await fetch("/api/requests", { cache: 'no-store' });
       const json = await res.json();
       if (json.data) {
         setRequests(json.data);
@@ -125,7 +125,7 @@ export default function ProviderDashboard() {
         const data = await res.json();
         throw new Error(data.error || "فشل في قبول الطلب");
       }
-      fetchRequests();
+      window.location.href = '/provider/patients';
     } catch (err: any) {
       alert(err.message || "حدث خطأ");
     } finally {

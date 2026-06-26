@@ -46,7 +46,7 @@ export default function MyRequestsPage() {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await fetch("/api/requests");
+        const res = await fetch("/api/requests", { cache: 'no-store' });
         const json = await res.json();
         if (json.data) {
           setRequests(json.data);

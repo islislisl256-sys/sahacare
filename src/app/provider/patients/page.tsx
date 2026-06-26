@@ -30,7 +30,7 @@ export default function ProviderCasesPage() {
   const fetchCases = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/appointments?providerId=${(session?.user as any).id}`);
+      const res = await fetch(`/api/appointments?providerId=${(session?.user as any).id}`, { cache: 'no-store' });
       if (!res.ok) throw new Error("فشل في جلب الحالات");
       const data = await res.json();
       setAppointments(data.data || []);

@@ -32,7 +32,7 @@ export default function TreatmentDetailsPage() {
     setLoading(true);
     try {
       // 1. Fetch appointment details by request_id
-      const res = await fetch(`/api/appointments?requestId=${id}`);
+      const res = await fetch(`/api/appointments?requestId=${id}`, { cache: 'no-store' });
       if (!res.ok) throw new Error("Failed to fetch appointment");
       const apptData = await res.json();
       
@@ -43,7 +43,7 @@ export default function TreatmentDetailsPage() {
       setData(apptData.data);
 
       // 2. Fetch medical records for this appointment
-      const recRes = await fetch(`/api/records?appointmentId=${apptData.data.id}`);
+      const recRes = await fetch(`/api/records?appointmentId=${apptData.data.id}`, { cache: 'no-store' });
       if (recRes.ok) {
         const recData = await recRes.json();
         setRecord(recData.data || null);
