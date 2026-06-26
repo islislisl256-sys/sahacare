@@ -64,7 +64,8 @@ export default function MyRequestsPage() {
 
   const handleRequestClick = (req: any) => {
     if (req.status === "pending") {
-      alert(t("pending_alert"));
+      // Go to request details and offers page
+      router.push(`/dashboard/my-requests/${req.id}`);
     } else if (req.status === "completed" || req.status === "confirmed" || req.status === "accepted") {
       router.push(`/dashboard/treatments/${req.id}`);
     }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useLanguage } from "@/context/LanguageContext";
-import { Megaphone, Hourglass, DollarSign, MapPin, Clock, FileText, Loader2, X, CheckCircle2 } from "lucide-react";
+import { Megaphone, Hourglass, DollarSign, MapPin, Clock, FileText, Loader2, X, CheckCircle2, Briefcase } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function ProviderDashboard() {
@@ -118,12 +118,26 @@ export default function ProviderDashboard() {
       {/* Main Board */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
         <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
-          <h3 className="text-lg font-bold text-slate-800 dark:text-white">{t("job_board")}</h3>
-          <div className="flex gap-2">
-            <select className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium outline-none">
-              <option>{t("filter_by_distance")}</option>
-              <option>{t("less_than_5km")}</option>
-              <option>{t("less_than_15km")}</option>
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-teal-600" />
+            {t("job_board")}
+          </h3>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => router.push('/provider/cases')}
+              className="bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 font-bold px-4 py-2 rounded-xl border border-indigo-200 dark:border-indigo-500/30 hover:bg-indigo-100 transition-colors text-sm"
+            >
+              حالاتي المقبولة
+            </button>
+            <select
+              value={distance}
+              onChange={(e) => setDistance(Number(e.target.value))}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm rounded-xl px-3 py-1.5 text-slate-700 dark:text-slate-300 font-medium focus:ring-2 focus:ring-red-500 outline-none"
+            >
+              <option value={5}>5 كم</option>
+              <option value={10}>10 كم</option>
+              <option value={20}>20 كم</option>
+              <option value={50}>50 كم</option>
             </select>
           </div>
         </div>
