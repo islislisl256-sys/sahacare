@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       .eq("id", userId)
       .single();
 
-    if (!userData || userData.role !== 'provider') {
+    if (!userData || (userData as any).role !== 'provider') {
       return NextResponse.json({ error: "فقط المعالجين يمكنهم قبول الطلبات" }, { status: 403 });
     }
 
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "لم يتم العثور على الطلب" }, { status: 404 });
     }
 
-    if (request.status !== 'pending') {
+    if ((request as any).status !== 'pending') {
       return NextResponse.json({ error: "هذا الطلب لم يعد متاحاً للقبول" }, { status: 400 });
     }
 
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     const { data: appointment, error: apptError } = await (supabaseAdmin.from("appointments") as any)
       .insert({
         request_id: requestId,
-        patient_id: request.patient_id,
+        patient_id: (request as any).patient_id,
         provider_id: userId,
         status: 'scheduled',
       })

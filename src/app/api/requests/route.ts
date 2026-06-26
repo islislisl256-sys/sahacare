@@ -77,8 +77,8 @@ export async function GET(req: NextRequest) {
     // Fetch fresh role from DB to avoid NextAuth token caching issues during dev
     let role = (session.user as any).role;
     const { data: userData } = await supabaseAdmin.from("users").select("role").eq("id", userId).single();
-    if (userData && userData.role) {
-      role = userData.role;
+    if (userData && (userData as any).role) {
+      role = (userData as any).role;
     }
     
     const { searchParams } = new URL(req.url);
