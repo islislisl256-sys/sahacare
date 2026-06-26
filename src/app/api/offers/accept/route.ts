@@ -35,20 +35,20 @@ export async function POST(req: NextRequest) {
     // 2. Update offer status to 'accepted'
     await supabaseAdmin
       .from("offers")
-      .update({ status: 'accepted' })
+      .update({ status: 'accepted' } as any)
       .eq("id", offerId);
 
     // Reject other offers for this request
     await supabaseAdmin
       .from("offers")
-      .update({ status: 'rejected' })
+      .update({ status: 'rejected' } as any)
       .eq("request_id", requestId)
       .neq("id", offerId);
 
     // 3. Update request status to 'accepted'
     await supabaseAdmin
       .from("service_requests")
-      .update({ status: 'accepted' })
+      .update({ status: 'accepted' } as any)
       .eq("id", requestId);
 
     // 4. Create an appointment/case
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
         provider_id: providerId,
         offer_id: offerId,
         status: "scheduled"
-      })
+      } as any)
       .select()
       .single();
 
