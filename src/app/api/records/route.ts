@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     // Get the request id from the appointment to update it
     const { data: appt } = await supabaseAdmin.from("appointments").select("request_id").eq("id", appointmentId).single();
     if (appt) {
-      await (supabaseAdmin.from("service_requests") as any).update({ status: 'completed' }).eq("id", appt.request_id);
+      await (supabaseAdmin.from("service_requests") as any).update({ status: 'completed' }).eq("id", (appt as any).request_id);
     }
 
     return NextResponse.json({ success: true, data });
