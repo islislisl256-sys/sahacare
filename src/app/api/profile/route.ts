@@ -23,7 +23,8 @@ export async function GET(req: any) {
 
     // Fetch provider specific data if role is provider
     let providerProfile = null;
-    if (user.role === "provider") {
+    const userData = user as any;
+    if (userData.role === "provider") {
       const { data: profile, error: profileError } = await supabaseAdmin
         .from("provider_profiles")
         .select("*")
@@ -58,8 +59,7 @@ export async function PUT(req: any) {
     } = body;
 
     // 1. Update basic user data
-    const { error: updateError } = await supabaseAdmin
-      .from("users")
+    const { error: updateError } = await (supabaseAdmin.from("users") as any)
       .update({
         name,
         phone,
@@ -73,8 +73,7 @@ export async function PUT(req: any) {
 
     // 2. Update provider profile if applicable
     if ((session.user as any).role === "provider") {
-      const { error: providerUpdateError } = await supabaseAdmin
-        .from("provider_profiles")
+      const { error: providerUpdateError } = await (supabaseAdmin.from("provider_profiles") as any)
         .update({
           specialty,
           bio,
