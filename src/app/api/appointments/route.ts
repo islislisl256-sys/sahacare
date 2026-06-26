@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       if (error) throw error;
       
       const mappedData = data ? {
-        ...data,
+        ...(data as any),
         provider: (data as any).provider_profile?.user || null
       } : null;
       
