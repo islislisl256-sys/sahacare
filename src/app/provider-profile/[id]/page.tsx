@@ -107,7 +107,7 @@ export default function ProviderProfilePage() {
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center justify-center md:justify-start gap-2">
               {provider.name}
               {provider.profile?.is_verified && (
-                <CheckCircle2 className="w-6 h-6 text-green-500" title="موثق" />
+                <span title="موثق"><CheckCircle2 className="w-6 h-6 text-green-500" /></span>
               )}
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 mt-2 flex items-center justify-center md:justify-start gap-2">
