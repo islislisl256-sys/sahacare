@@ -3,7 +3,7 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, ArrowRight, User, PhoneCall, Award, Activity, MapPin, CalendarDays, AlertCircle } from "lucide-react";
+import { Loader2, ArrowRight, User, PhoneCall, Award, Activity, MapPin, CalendarDays, AlertCircle, CheckCircle2 } from "lucide-react";
 
 import { calculateDistance } from "@/lib/distance";
 
