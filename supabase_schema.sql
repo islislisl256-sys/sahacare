@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS public.provider_profiles (
   university_degree_url TEXT,
   license_url TEXT,
   is_verified BOOLEAN DEFAULT FALSE,
+  location_lat DOUBLE PRECISION,
+  location_lng DOUBLE PRECISION,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

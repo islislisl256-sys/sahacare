@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2, ArrowRight, User, PhoneCall, Award, Activity, MapPin, CalendarDays, AlertCircle } from "lucide-react";
 
+import { calculateDistance } from "@/lib/distance";
+
 export default function ProviderProfilePage() {
   const { t } = useLanguage();
   const params = useParams();
@@ -14,6 +16,7 @@ export default function ProviderProfilePage() {
   const [provider, setProvider] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [distance, setDistance] = useState<number | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -28,6 +31,24 @@ export default function ProviderProfilePage() {
       if (!res.ok) throw new Error("لم يتم العثور على المعالج");
       const data = await res.json();
       setProvider(data.data);
+      
+      // Calculate distance if provider has location
+      if (data.data.profile?.location_lat && data.data.profile?.location_lng) {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const d = calculateDistance(
+                position.coords.latitude,
+                position.coords.longitude,
+                data.data.profile.location_lat,
+                data.data.profile.location_lng
+              );
+              setDistance(Math.round(d));
+            },
+            () => console.warn("Geolocation permission denied")
+          );
+        }
+      }
     } catch (err: any) {
       console.error(err);
       setErrorMsg(err.message);
@@ -120,11 +141,18 @@ export default function ProviderProfilePage() {
           
           <div className="space-y-4">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-blue-500" /> منطقة العمل
+              <MapPin className="w-5 h-5 text-blue-500" /> منطقة العمل والمسافة
             </h3>
             <p className="text-slate-600 dark:text-slate-400">
               {provider.profile?.work_area || "غير محدد"}
             </p>
+            {distance !== null ? (
+              <p className="text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-500/10 px-4 py-2 rounded-xl inline-block mt-2">
+                يبعد عنك بحوالي: {distance} كم
+              </p>
+            ) : (
+              <p className="text-slate-500 text-sm mt-2">المسافة غير متاحة (تتطلب تحديد موقع المركز)</p>
+            )}
 
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 mt-6">
               <CalendarDays className="w-5 h-5 text-teal-500" /> أيام العطلة
