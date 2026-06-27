@@ -20,7 +20,9 @@ export async function POST(req: NextRequest) {
       locationLat, 
       locationLng, 
       addressText, 
-      prescriptionUrl 
+      prescriptionUrl,
+      patientName,
+      patientPhone 
     } = body;
 
     // Ensure user exists in public.users to prevent foreign key constraint errors
@@ -29,7 +31,8 @@ export async function POST(req: NextRequest) {
       .upsert({
         id: patientId,
         email: session.user.email,
-        name: session.user.name || "مستخدم",
+        name: patientName || session.user.name || "مستخدم",
+        phone: patientPhone || null,
         role: "patient"
       }, { onConflict: "id" });
       

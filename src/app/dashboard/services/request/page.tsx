@@ -40,11 +40,29 @@ function RequestServiceContent() {
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [budget, setBudget] = useState("");
+  const [patientName, setPatientName] = useState("");
+  const [patientPhone, setPatientPhone] = useState("");
   
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch("/api/profile");
+        const json = await res.json();
+        if (json.data) {
+          if (json.data.name) setPatientName(json.data.name);
+          if (json.data.phone) setPatientPhone(json.data.phone);
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile", err);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -135,7 +153,9 @@ function RequestServiceContent() {
         locationLat,
         locationLng,
         addressText: address,
-        prescriptionUrl
+        prescriptionUrl,
+        patientName,
+        patientPhone
       };
       
       const res = await fetch("/api/requests", {
@@ -207,6 +227,37 @@ function RequestServiceContent() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Patient Info */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 font-bold text-gray-800 dark:text-white text-sm">
+                <UserIcon className="w-4 h-4 text-red-500" /> {(t as any)("name") || "الاسم"}
+              </label>
+              <input
+                required
+                value={patientName}
+                onChange={e => setPatientName(e.target.value)}
+                placeholder="الاسم الكامل"
+                className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 font-bold text-gray-800 dark:text-white text-sm">
+                <Phone className="w-4 h-4 text-red-500" /> {t("phone") || "رقم الهاتف"}
+              </label>
+              <input
+                required
+                type="tel"
+                value={patientPhone}
+                onChange={e => setPatientPhone(e.target.value)}
+                placeholder="05xxxxxx"
+                className="w-full border border-gray-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white outline-none focus:border-red-400 transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Location Input */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
           <label className="flex items-center gap-2 font-bold text-gray-800 dark:text-white text-sm">
