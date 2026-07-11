@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'public',
   server: {
     // توجيه التطبيق للاتصال بالسيرفر مباشرة
-    url: 'https://sahacare-pi.vercel.app/',
+    url: 'https://sahacare.vercel.app/',
     cleartext: true
   }
 };
