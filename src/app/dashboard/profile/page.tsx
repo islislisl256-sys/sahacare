@@ -3,7 +3,10 @@
 import { useSession, signOut } from "next-auth/react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState, useEffect } from "react";
-import { Loader2, Key, Edit2 } from "lucide-react";
+import { Loader2, Key, Edit2, MapPin, Briefcase } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
 export default function Profile() {
   const { data: session } = useSession();
@@ -20,6 +23,14 @@ export default function Profile() {
   const [address, setAddress] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
+  // Provider Form State
+  const [specialty, setSpecialty] = useState("");
+  const [bio, setBio] = useState("");
+  const [workArea, setWorkArea] = useState("");
+  const [dayOff, setDayOff] = useState("");
+  const [locationLat, setLocationLat] = useState<number | null>(null);
+  const [locationLng, setLocationLng] = useState<number | null>(null);
+
   const fetchProfile = async () => {
     try {
       const res = await fetch("/api/profile");
@@ -29,6 +40,14 @@ export default function Profile() {
           setName(data.user.name || "");
           setPhone(data.user.phone || "");
           setAddress(data.user.address || "");
+        }
+        if (data.providerProfile) {
+          setSpecialty(data.providerProfile.specialty || "");
+          setBio(data.providerProfile.bio || "");
+          setWorkArea(data.providerProfile.work_area || "");
+          setDayOff(data.providerProfile.day_off || "");
+          setLocationLat(data.providerProfile.location_lat || null);
+          setLocationLng(data.providerProfile.location_lng || null);
         }
       }
     } catch (err) {
@@ -55,6 +74,12 @@ export default function Profile() {
           name,
           phone,
           address,
+          specialty,
+          bio,
+          work_area: workArea,
+          day_off: dayOff,
+          location_lat: locationLat,
+          location_lng: locationLng,
           newPassword: newPassword ? newPassword : undefined
         }),
       });
@@ -183,6 +208,79 @@ export default function Profile() {
               </div>
             </div>
           </div>
+
+          {/* Provider Specific Section */}
+          {(session?.user as any)?.role === 'provider' && (
+            <div className="pt-8 border-t border-gray-100 dark:border-slate-800 mt-8">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-red-500" /> معلومات العيادة / العمل
+              </h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">التخصص</label>
+                  {!isEditing ? (
+                    <div className="w-full bg-gray-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-gray-800 dark:text-white font-medium">
+                      {specialty || "غير محدد"}
+                    </div>
+                  ) : (
+                    <input type="text" value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-red-500 dark:text-white" />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">منطقة العمل</label>
+                  {!isEditing ? (
+                    <div className="w-full bg-gray-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-gray-800 dark:text-white font-medium">
+                      {workArea || "غير محدد"}
+                    </div>
+                  ) : (
+                    <input type="text" value={workArea} onChange={(e) => setWorkArea(e.target.value)} className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-red-500 dark:text-white" />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">أيام العطلة</label>
+                  {!isEditing ? (
+                    <div className="w-full bg-gray-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-gray-800 dark:text-white font-medium">
+                      {dayOff || "غير محدد"}
+                    </div>
+                  ) : (
+                    <input type="text" value={dayOff} onChange={(e) => setDayOff(e.target.value)} className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-red-500 dark:text-white" />
+                  )}
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">نبذة عنك</label>
+                  {!isEditing ? (
+                    <div className="w-full bg-gray-50 dark:bg-slate-800 border border-transparent rounded-xl px-4 py-3 text-gray-800 dark:text-white font-medium min-h-[100px] whitespace-pre-wrap">
+                      {bio || "لم يتم كتابة نبذة بعد."}
+                    </div>
+                  ) : (
+                    <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-red-500 dark:text-white min-h-[100px]" />
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+                  <MapPin className="w-4 h-4" /> موقع المركز على الخريطة
+                  <span className="text-xs text-gray-400 font-normal">(يستخدم لحساب المسافة للمرضى)</span>
+                </label>
+                <div className="h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 z-0">
+                  <MapPicker 
+                    position={locationLat && locationLng ? [locationLat, locationLng] : undefined}
+                    onLocationSelect={(lat, lng) => {
+                      if (isEditing) {
+                        setLocationLat(lat);
+                        setLocationLng(lng);
+                      }
+                    }}
+                  />
+                </div>
+                {!isEditing && (!locationLat || !locationLng) && (
+                  <p className="text-sm text-amber-600 mt-2">يرجى الضغط على تعديل البيانات لاختيار موقع مركزك.</p>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Security (Password Change) */}
           {isEditing && (

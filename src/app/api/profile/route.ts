@@ -54,7 +54,7 @@ export async function PUT(req: any) {
 
     const { 
       name, phone, address, avatar_url, // For users table
-      specialty, bio, work_area, default_travel_cost, day_off, // For provider_profiles
+      specialty, bio, work_area, default_travel_cost, day_off, location_lat, location_lng, // For provider_profiles
       newPassword // For auth.users
     } = body;
 
@@ -80,6 +80,8 @@ export async function PUT(req: any) {
           work_area,
           default_travel_cost,
           day_off,
+          location_lat,
+          location_lng,
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", userId);
