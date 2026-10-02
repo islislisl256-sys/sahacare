@@ -266,13 +266,14 @@ export default function Profile() {
                 </label>
                 <div className="h-64 sm:h-80 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 z-0">
                   <MapPicker 
-                    position={locationLat && locationLng ? [locationLat, locationLng] : undefined}
-                    onLocationSelect={(lat, lng) => {
+                    initialCoords={locationLat && locationLng ? { lat: locationLat, lng: locationLng } : undefined}
+                    onLocationSelect={(location) => {
                       if (isEditing) {
-                        setLocationLat(lat);
-                        setLocationLng(lng);
+                        setLocationLat(location.lat);
+                        setLocationLng(location.lng);
                       }
                     }}
+                    onClose={() => {}}
                   />
                 </div>
                 {!isEditing && (!locationLat || !locationLng) && (
